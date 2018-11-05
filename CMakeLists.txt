@@ -1,26 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
-project(lzhlib)
+project(lzhlib
+        VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I./include -DLZHLIB_BUILDING_AND_TESTING")
+set(bin_install_path "bin")
+set(include_install_path "include/${PROJECT_NAME}")
+set(lib_install_path "lib/${PROJECT_NAME}")
 
-add_executable(lzhlib
-        include/graph/directed_graph.hpp
-        include/graph/edge.hpp
-        include/graph/edge_id.hpp
-        include/graph/graph.hpp
-        include/graph/graph_base.hpp
-        include/graph/undirected_graph.hpp
-        include/graph/vertex.hpp
-        include/graph/vertex_id.hpp
-        include/repository/dynamic_repository.hpp
-        include/repository/indexed_repository.hpp
-        include/repository/light_weight_repository.hpp
-        include/repository/repository.hpp
-        include/repository/sparse_indexed_repository.hpp
-        include/repository/stable_repository.hpp
-        include/repository/stock_id.hpp
-        test/test.cpp
-        test/graph/white_box_test.cpp
-        test/graph/white_box_test.hpp test/graph/test_graph.hpp test/repository/test_repository.hpp)
+set(header_path "${PROJECT_SOURCE_DIR}/include")
+
+include_directories(before "${header_path}")
+include_directories(before "${PROJECT_BINARY_DIR}/include")
+
+add_subdirectory("include/${PROJECT_NAME}")
+add_subdirectory(test)
+add_subdirectory(example)

@@ -2,7 +2,7 @@
 #define LZHLIB_GRAPH_TEST_GRAPH_HPP
 
 #include <cassert>
-#include "../../include/graph/graph.hpp"
+#include "lzhlib/graph/graph.hpp"
 #include "white_box_test.hpp"
 namespace test
 {
@@ -15,8 +15,8 @@ namespace test
         void test_undirected_graph()
         {
                 undirected_graph<std::string, std::string> g;
-                vertex_id v0 = g.add_vertex(std::in_place, "v0");
-                vertex_id v1 = g.add_vertex(std::in_place, "v1");
+                vertex_id v0 = g.add_vertex("v0");
+                vertex_id v1 = g.add_vertex("v1");
                 {
                     edge_id e0 = g.add_edge(v0, v1);
                     assert(g.value(e0) == "");
@@ -94,8 +94,8 @@ namespace test
         void test_directed_graph()
         {
             directed_graph<std::string, std::string> g;
-            vertex_id v0 = g.add_vertex(std::in_place, "v0");
-            vertex_id v1 = g.add_vertex(std::in_place, "v1");
+            vertex_id v0 = g.add_vertex("v0");
+            vertex_id v1 = g.add_vertex("v1");
             {
                 edge_id e0 = g.add_edge(v0, v1);
                 assert(g.value(e0) == "");
@@ -150,7 +150,7 @@ namespace test
                 assert(!g.adjacent(v0, v1));
                 assert(!g.adjacent(v1, v0));
                 {
-                    edge_id e1 = g.add_edge(v0, v1, std::in_place, "e1");
+                    edge_id e1 = g.add_edge(v0, v1, "e1");
                     assert(g.value(e1) == "e1");
                     assert(g.adjacent(v0, v1));
                     assert(!g.adjacent(v1, v0));

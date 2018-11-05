@@ -2,7 +2,9 @@
 #define LZHLIB_GRAPH_VERTEX_ID_HPP
 
 #include <cstddef>    //for std::size_t
-#include "../repository/stock_id.hpp"
+#include <istream>
+#include <ostream>
+#include "lzhlib/repository/stock_id.hpp"
 
 namespace lzhlib
 {

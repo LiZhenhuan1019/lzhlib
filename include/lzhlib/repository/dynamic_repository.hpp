@@ -53,12 +53,12 @@ namespace lzhlib
             using iterator_category = std::bidirectional_iterator_tag;
         private:
             template <typename iter1, typename iter2>
-                static constexpr bool is_iterator_v = std::is_base_of_v<base_iter, iter1> && std::is_base_of_v<base_iter, iter2>;
+            static constexpr bool is_iterator_v = std::is_base_of_v<base_iter, iter1> && std::is_base_of_v<base_iter, iter2>;
         public:
             template <typename iter1, typename iter2, std::enable_if_t<is_iterator_v<iter1, iter2>, int> = 0>
             friend bool operator==(iter1 const &lhs, iter2 const &rhs)
             {
-                return lhs.id_ == rhs.id_;
+                return lhs.id() == rhs.id();
             }
             template <typename iter1, typename iter2, std::enable_if_t<is_iterator_v<iter1, iter2>, int> = 0>
             friend bool operator!=(iter1 const &lhs, iter2 const &rhs)
@@ -207,7 +207,8 @@ namespace lzhlib
             if (ret == stocks.size())  //no reusable stock
             {
                 return allocate_stock(std::forward<Args>(args)...);
-            } else
+            }
+            else
             {
                 return reuse_stock(ret, std::forward<Args>(args)...);
             }
@@ -286,14 +287,14 @@ namespace lzhlib
         template <class ...Args>
         id_t allocate_stock(Args &&... args)
         {
-            stocks.push_back(std::make_optional<stock_t>(std::forward<Args>(args)...));
+            stocks.emplace_back(std::in_place, std::forward<Args>(args)...);
             id_t ret{stocks.size() - 1};    //the allocated stock is at the last position in the container.
             return ret;
         }
         template <class ...Args>
         id_t reuse_stock(id_t reused, Args &&... args)//precondition:stocks[reused.id_()]必须为一个空指针
         {
-            reusable_pointer(reused) = std::make_optional<stock_t>(std::forward<Args>(args)...);
+            reusable_optional(reused) = std::make_optional<stock_t>(std::forward<Args>(args)...);
             return reused;
         }
         id_t reusable_stock() const               //postcondition: 设返回值为ret,则stocks[ret.id_()]为一个空指针.
@@ -303,7 +304,7 @@ namespace lzhlib
                 ++current;
             return current;
         }
-        opt_t &reusable_pointer(id_t id)          //just a checker.The calling may be optimized out -- that's to say, may be inlined.
+        opt_t &reusable_optional(id_t id)          //just a checker.The calling may be optimized out -- that's to say, may be inlined.
         {
 #ifndef NDEBUG
             if (stocks[id.id()] != std::nullopt)

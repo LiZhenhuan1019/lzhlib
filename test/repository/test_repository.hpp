@@ -1,7 +1,7 @@
 #ifndef LZHLIB_REPOSITORY_TEST_REPOSITORY_HPP
 #define LZHLIB_REPOSITORY_TEST_REPOSITORY_HPP
-
-#include "../../include/repository/repository.hpp"
+#include <cassert>
+#include "lzhlib/repository/repository.hpp"
 namespace test
 {
     namespace repository

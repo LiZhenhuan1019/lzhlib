@@ -2,7 +2,7 @@
 
 #define private public
 #include "white_box_test.hpp"
-#include "../../include/graph/graph.hpp"
+#include "lzhlib/graph/graph.hpp"
 
 using namespace std;
 using namespace lzhlib;
@@ -70,7 +70,7 @@ void test_vertex_repository()
     {
         r0.get_stock(i0);
     }
-    catch (dynamic_repository<vertex<int>>::attempt_to_use_unassigned_stock e)
+    catch (dynamic_repository<vertex<int>>::attempt_to_use_unassigned_stock const&e)
     {
         assert(e.what() == std::string("Attempt to use unassigned stock whose id is ") +
                            std::to_string(i0.id()) + "!");

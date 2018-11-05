@@ -4,7 +4,7 @@
 #include <cstddef>     //for std::size_t
 #include <istream>
 #include <ostream>
-#include "../repository/stock_id.hpp"
+#include "lzhlib/repository/stock_id.hpp"
 
 namespace lzhlib
 {

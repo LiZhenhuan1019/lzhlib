@@ -20,6 +20,8 @@ namespace lzhlib
             using pair_t = std::pair<vertex_id, vertex_id>;
 
             edge() = default;
+            edge(std::in_place_t)
+            {}
             edge(null_value_tag)
             {}
             bool is_associated(vertex_id i) const

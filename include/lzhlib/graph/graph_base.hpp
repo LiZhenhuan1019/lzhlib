@@ -3,7 +3,7 @@
 
 #include "vertex.hpp"
 #include "edge.hpp"
-#include "../repository/dynamic_repository.hpp"
+#include "lzhlib/repository/dynamic_repository.hpp"
 
 namespace lzhlib
 {
@@ -13,7 +13,7 @@ namespace lzhlib
     public:
         using vertex_t = detail::vertex<VertexValueT>;
         using vertex_value_t = typename vertex_t::vertex_value_t;
-        using edge_ref_t = detail::edge_ref;
+        using edge_ref_t = edge_ref;
         using edge_t = detail::edge<EdgeValueT>;
         using edge_value_t = typename edge_t::edge_value_t;
         using pair_t = typename edge_t::pair_t;
@@ -31,7 +31,7 @@ namespace lzhlib
                 ret.push_back(e.opposite_vertex());
             return ret;
         }
-        auto const &associated_edges(vertex_id v) const  //比neighbors更建议使用(出于效率考虑)
+        std::set<edge_ref_t, std::less<void>> const &associated_edges(vertex_id v) const  //比neighbors更建议使用(出于效率考虑)
         {
             return get_vertex(v).associated_edges();
         }
@@ -39,7 +39,7 @@ namespace lzhlib
         template <class ...Args>
         vertex_id add_vertex(Args &&...args)
         {
-            return vertex_id(vertex_repository.add_stock(std::forward<Args>(args)...));
+            return vertex_id(vertex_repository.add_stock(std::in_place, std::forward<Args>(args)...));
         }
 
         pair_t associated_vertices(edge_id e) const

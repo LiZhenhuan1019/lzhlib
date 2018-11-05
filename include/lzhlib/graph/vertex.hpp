@@ -24,75 +24,76 @@ namespace lzhlib
 
     class null_value_tag
     {
+        explicit null_value_tag() = default;
     };
+    class edge_ref
+    {
+    public:
+        edge_ref() = default;
+        edge_ref(edge_id e, vertex_id opposite)
+            : edge_(e), vertex_(opposite)
+        {}
+        edge_id edge() const
+        {
+            return edge_;
+        }
+        vertex_id opposite_vertex() const
+        {
+            return vertex_;
+        }
+        bool is_connected(vertex_id v) const
+        {
+            return vertex_ == v;
+        }
+
+        bool operator<(edge_ref rhs) const  //默认忽略opposite_vertex()
+        {
+            return edge_ < rhs.edge_;
+        }
+        bool operator==(edge_ref rhs) const
+        {
+            return edge_ == rhs.edge_;
+        }
+        bool operator!=(edge_ref rhs) const
+        {
+            return !(*this == rhs);
+        }
+
+    private:
+        edge_id edge_;
+        vertex_id vertex_;
+
+        friend std::istream &operator>>(std::istream &in, edge_ref &r)
+        {
+            in >> r.edge_ >> r.vertex_;
+            return in;
+        }
+        friend std::ostream &operator<<(std::ostream &out, edge_ref r)
+        {
+            out << r.edge_ << r.vertex_;
+            return out;
+        }
+    };
+
+    inline bool operator<(edge_ref r, edge_id rhs)
+    {
+        return r.edge() < rhs;
+    }
+    inline bool operator<(edge_id rhs, edge_ref r)
+    {
+        return rhs < r.edge();
+    }
+    inline bool operator<(edge_ref r, vertex_id rhs) //仍可依据opposite_vertex()来比较
+    {
+        return r.opposite_vertex() < rhs;
+    }
+    inline bool operator<(vertex_id rhs, edge_ref r) //仍可依据opposite_vertex()来比较
+    {
+        return rhs < r.opposite_vertex();
+    }
+
     namespace detail
     {
-        class edge_ref
-        {
-        public:
-            edge_ref() = default;
-            edge_ref(edge_id e, vertex_id opposite)
-                : edge_(e), vertex_(opposite)
-            {}
-            edge_id edge() const
-            {
-                return edge_;
-            }
-            vertex_id opposite_vertex() const
-            {
-                return vertex_;
-            }
-            bool is_connected(vertex_id v) const
-            {
-                return vertex_ == v;
-            }
-
-            bool operator<(edge_ref rhs) const  //默认忽略opposite_vertex()
-            {
-                return edge_ < rhs.edge_;
-            }
-            bool operator==(edge_ref rhs) const
-            {
-                return edge_ == rhs.edge_;
-            }
-            bool operator!=(edge_ref rhs) const
-            {
-                return !(*this == rhs);
-            }
-
-        private:
-            edge_id edge_;
-            vertex_id vertex_;
-
-            friend std::istream &operator>>(std::istream &in, edge_ref &r)
-            {
-                in >> r.edge_ >> r.vertex_;
-                return in;
-            }
-            friend std::ostream &operator<<(std::ostream &out, edge_ref r)
-            {
-                out << r.edge_ << r.vertex_;
-                return out;
-            }
-        };
-
-        inline bool operator<(edge_ref r, edge_id rhs)
-        {
-            return r.edge() < rhs;
-        }
-        inline bool operator<(edge_id rhs, edge_ref r)
-        {
-            return rhs < r.edge();
-        }
-        inline bool operator<(edge_ref r, vertex_id rhs) //仍可依据opposite_vertex()来比较
-        {
-            return r.opposite_vertex() < rhs;
-        }
-        inline bool operator<(vertex_id rhs, edge_ref r) //仍可依据opposite_vertex()来比较
-        {
-            return rhs < r.opposite_vertex();
-        }
-
 
         template <class VertexValueT = null_value_tag>
         class vertex;
@@ -105,6 +106,8 @@ namespace lzhlib
             using vertex_value_t = null_value_tag;
 
             vertex() = default;
+            vertex(std::in_place_t)
+            {}
             vertex(null_value_tag)
             {}
 

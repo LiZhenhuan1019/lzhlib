@@ -6,7 +6,6 @@ namespace test
 {
     namespace repository
     {
-
         namespace dynamic
         {
             namespace detail

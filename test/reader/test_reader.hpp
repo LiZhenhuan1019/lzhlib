@@ -20,7 +20,6 @@ namespace lzhlib::test
             {
                 using lzhlib::reader::type;
                 using lzhlib::reader::type_list;
-                using lzhlib::reader::predefined_reader;
                 using lzhlib::tuple::arg;
                 using reader = lzhlib::reader::literal_reader<type_list<type<int>,
                                                                         type<std::string>,

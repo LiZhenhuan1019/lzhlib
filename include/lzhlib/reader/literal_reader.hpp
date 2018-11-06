@@ -30,49 +30,49 @@ namespace lzhlib
             IS_STRING(std::u16string)
             IS_STRING(std::u32string)
 #undef IS_STRING
-        }
-        template <typename T>
-        struct is_string : detail::is_string_base<std::remove_cv_t<std::remove_reference_t<T>>>
-        {
-        };
-        template <typename T>
-        constexpr auto is_string_v = is_string<T>::value;
+            template <typename T>
+            struct is_string : detail::is_string_base<std::remove_cv_t<std::remove_reference_t<T>>>
+            {
+            };
+            template <typename T>
+            constexpr auto is_string_v = is_string<T>::value;
 
-        template <typename ArithmeticT, reader_enum e, typename From = std::string_view>
-        struct predefined_reader;
-        template <typename ArithmeticT, typename From>
-        struct predefined_reader<ArithmeticT, reader_enum::arithmetic, From>
-        {
-            ArithmeticT operator()(From str) const
+            template <typename ArithmeticT, reader_enum e, typename From = std::string_view>
+            struct predefined_reader;
+            template <typename ArithmeticT, typename From>
+            struct predefined_reader<ArithmeticT, reader_enum::arithmetic, From>
             {
-                using namespace std::literals;
-                ArithmeticT result;
-                auto[ptr, error] = std::from_chars(str.data(), str.data() + str.size(), result);
-                if (ptr == str.data())
-                    throw std::logic_error("expect integer, got "s + str.data());
-                return result;
-            }
-        };
-        template <typename StringT, typename From>
-        struct predefined_reader<StringT, reader_enum::string, From>
-        {
-            StringT operator()(From str) const
+                ArithmeticT operator()(From str) const
+                {
+                    using namespace std::literals;
+                    ArithmeticT result;
+                    auto[ptr, error] = std::from_chars(str.data(), str.data() + str.size(), result);
+                    if (ptr == str.data())
+                        throw std::logic_error("expect integer, got "s + str.data());
+                    return result;
+                }
+            };
+            template <typename StringT, typename From>
+            struct predefined_reader<StringT, reader_enum::string, From>
             {
-                using traits = typename StringT::traits_type;
-                using from_traits = typename From::traits_type;
-                typename StringT::value_type delimiter;
-                if (from_traits::eq(str[0], '\''))
-                    from_traits::assign(delimiter, '\'');
-                else if (from_traits::eq(str[0], '"'))
-                    from_traits::assign(delimiter, '"');
-                else
-                    throw std::logic_error("expect ' or \"");
-                auto end = str.find_last_of(delimiter);
-                if (end == From::npos || end == 0)
-                    throw std::logic_error("expect close of quote");
-                return StringT(str.substr(1, end - 1));
-            }
-        };
+                StringT operator()(From str) const
+                {
+                    using traits = typename StringT::traits_type;
+                    using from_traits = typename From::traits_type;
+                    typename StringT::value_type delimiter;
+                    if (from_traits::eq(str[0], '\''))
+                        from_traits::assign(delimiter, '\'');
+                    else if (from_traits::eq(str[0], '"'))
+                        from_traits::assign(delimiter, '"');
+                    else
+                        throw std::logic_error("expect ' or \"");
+                    auto end = str.find_last_of(delimiter);
+                    if (end == From::npos || end == 0)
+                        throw std::logic_error("expect close of quote");
+                    return StringT(str.substr(1, end - 1));
+                }
+            };
+        }
         struct use_default_tag
         {
         };
@@ -110,9 +110,6 @@ namespace lzhlib
             using readers = std::tuple<typename Types::reader_type...>;
             static constexpr std::size_t size = sizeof...(Types);
         };
-        namespace detail
-        {
-        }
         template <typename TypeList, typename From = std::string_view>
         class literal_reader
         {

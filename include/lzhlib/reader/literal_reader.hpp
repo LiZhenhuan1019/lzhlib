@@ -8,7 +8,7 @@
 #include "lzhlib/stdlib_ext/tuple_ext.hpp"
 namespace lzhlib
 {
-    namespace literal_reader
+    namespace reader
     {
         enum class reader_enum
         {

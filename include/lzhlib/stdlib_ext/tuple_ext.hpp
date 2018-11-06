@@ -8,32 +8,6 @@ namespace lzhlib
 {
     namespace tuple
     {
-        namespace detail
-        {
-            template <typename T>
-            using remove_cvrf_t = std::remove_cv_t<std::remove_reference_t<T>>;
-            template <typename Tuple, std::size_t Index>
-            constexpr std::tuple_element_t<Index, Tuple> get_argument()
-            {
-                return std::tuple_element_t<Index, Tuple>();
-            }
-            template <typename Tuple, std::size_t Index, typename Argument, typename ...ArgumentSeq, std::enable_if_t<Index == remove_cvrf_t<Argument>::index, int> = 0>
-            constexpr std::tuple_element_t<Index, Tuple> get_argument(Argument &&argument, ArgumentSeq &&...argument_seq)
-            {
-                return std::forward<typename remove_cvrf_t<Argument>::value_type &&>(argument.value);
-            }
-            template <typename Tuple, std::size_t Index, typename Argument, typename ...ArgumentSeq, std::enable_if_t<Index != remove_cvrf_t<Argument>::index, short> = 0>
-            constexpr std::tuple_element_t<Index, Tuple> get_argument(Argument &&argument, ArgumentSeq &&...argument_seq)
-            {
-                return get_argument<Tuple, Index>(argument_seq...);
-            }
-
-            template <typename Tuple, std::size_t ...Indices, typename ...Arguments>
-            constexpr Tuple create_tuple_impl(std::index_sequence<Indices...>, Arguments &&...arguments)
-            {
-                return Tuple{get_argument<Tuple, Indices>(arguments...)...};
-            };
-        }
         template <std::size_t Index, typename ValueType>
         struct arg_helper
         {
@@ -53,6 +27,40 @@ namespace lzhlib
         arg_helper<Index, std::initializer_list<ValueType>> arg(std::initializer_list<ValueType> &&list)
         {
             return arg_helper<Index, std::initializer_list<ValueType>>{std::move(list)};
+        }
+        namespace detail
+        {
+            template <typename T>
+            using remove_cvrf_t = std::remove_cv_t<std::remove_reference_t<T>>;
+            template <std::size_t Level>
+            struct overload_level : overload_level<Level - 1>
+            {
+            };
+            template <>
+            struct overload_level<0>
+            {
+            };
+            template <std::size_t Index, typename Tuple>
+            constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<1>)
+            {
+                return std::tuple_element_t<Index, Tuple>();
+            }
+            template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq, typename = std::enable_if_t<std::is_same_v<arg_helper<Index, typename remove_cvrf_t<Argument>::value_type>, remove_cvrf_t<Argument>>, void>>
+            constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<1>, Argument &&argument, ArgumentSeq &&...argument_seq)
+            {
+                return std::forward<typename remove_cvrf_t<Argument>::value_type &&>(argument.value);
+            }
+            template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq>
+            constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<0>, Argument &&argument, ArgumentSeq &&...argument_seq)
+            {
+                return get_argument<Index, Tuple>(overload_level<1>{}, argument_seq...);
+            }
+
+            template <typename Tuple, std::size_t ...Indices, typename ...Arguments>
+            constexpr Tuple create_tuple_impl(std::index_sequence<Indices...>, Arguments &&...arguments)
+            {
+                return Tuple{get_argument<Indices, Tuple>(overload_level<1>{}, arguments...)...};
+            };
         }
         template <typename Tuple, typename ...Arguments>
         constexpr Tuple create_tuple(Arguments &&...arguments)

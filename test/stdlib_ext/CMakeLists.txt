@@ -5,3 +5,4 @@ add_executable(test_stdlib_ext
         test_stdlib_ext.cpp
         test_tuple_ext.hpp
         test_stdlib_ext.hpp)
+target_link_libraries(test_stdlib_ext lzhlib_target)

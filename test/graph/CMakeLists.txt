@@ -9,3 +9,4 @@ add_executable(test_graph
         test_graph.cpp
         white_box_test.cpp
         white_box_test.hpp )
+target_link_libraries(test_graph lzhlib_target)

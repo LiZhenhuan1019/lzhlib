@@ -5,6 +5,6 @@
 
 int main()
 {
-    test::repository::test();
+    lzhlib::test::repository::test();
     return 0;
 }

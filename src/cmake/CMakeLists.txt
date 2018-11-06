@@ -1,0 +1,1 @@
+install(FILES lzhlib-config.cmake DESTINATION ${main_lib_install_path})

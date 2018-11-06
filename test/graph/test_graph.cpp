@@ -6,6 +6,6 @@
 
 int main()
 {
-    test::graph::test();
+    lzhlib::test::graph::test();
     return 0;
 }

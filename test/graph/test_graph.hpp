@@ -4,7 +4,7 @@
 #include <cassert>
 #include "lzhlib/graph/graph.hpp"
 #include "white_box_test.hpp"
-namespace test
+namespace lzhlib::test
 {
     namespace graph
     {

@@ -176,14 +176,14 @@ namespace lzhlib
 
         bool is_id_valid(id_t id) const
         {
-            return id.id() < stocks.size() && !is_nullopt(id);
+            return id.id() < stocks.size() && !check_nullopt(id);
         }
 
         //id_ interface
         stock_t &get_stock(id_t id)
         {
 #ifndef NDEBUG
-            if (is_nullopt(id))
+            if (check_nullopt(id))
             {
                 throw attempt_to_use_unassigned_stock(id);
             }
@@ -193,7 +193,7 @@ namespace lzhlib
         stock_t const &get_stock(id_t id) const
         {
 #ifndef NDEBUG
-            if (is_nullopt(id))
+            if (check_nullopt(id))
             {
                 throw attempt_to_use_unassigned_stock(id);
             }
@@ -216,7 +216,7 @@ namespace lzhlib
         void remove_stock(id_t id)
         {
 #ifndef NDEBUG
-            if (is_nullopt(id))
+            if (check_nullopt(id))
                 throw attempt_to_remove_nonexistent_stock(id);
 #endif // NDEBUG
             stocks[id.id()].reset();
@@ -278,12 +278,14 @@ namespace lzhlib
             return const_iterator(*this, id_t{stocks.size()});
         }
     private:
-#ifndef NDEBUG
-        bool is_nullopt(id_t id) const
+        bool check_nullopt(id_t id) const
         {
+#ifndef NDEBUG
             return stocks[id.id()] == std::nullopt;
-        }
+#else
+            return false;
 #endif // NDEBUG
+        }
         template <class ...Args>
         id_t allocate_stock(Args &&... args)
         {

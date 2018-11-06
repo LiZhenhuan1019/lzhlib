@@ -3,7 +3,7 @@
 #include <vector>
 #include <cassert>
 #include "lzhlib/stdlib_ext/tuple_ext.hpp"
-namespace test
+namespace lzhlib::test
 {
     namespace stdlib_ext
     {
@@ -18,7 +18,6 @@ namespace test
                 static_assert(std::is_same_v<decltype(t1), decltype(t2)>, "test failed : type does not match.");
                 assert(t1 == t2);
             }
-
         }
     }
 }

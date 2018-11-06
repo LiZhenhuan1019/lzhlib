@@ -3,7 +3,7 @@
 #include <tuple>
 #include <utility>
 #include <initializer_list>
-#include "lzhlib/stdlib_ext/stdlib_ext_conf.hpp"
+//#include "lzhlib/stdlib_ext/stdlib_ext_conf.hpp"
 namespace lzhlib
 {
     namespace tuple

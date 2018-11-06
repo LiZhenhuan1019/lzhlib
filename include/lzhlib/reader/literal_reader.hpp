@@ -108,6 +108,7 @@ namespace lzhlib
         {
             using types = std::tuple<typename Types::object_type...>;
             using readers = std::tuple<typename Types::reader_type...>;
+            static constexpr std::size_t size = sizeof...(Types);
         };
         namespace detail
         {

@@ -19,7 +19,6 @@ target_include_directories(lzhlib_target BEFORE INTERFACE
         $<INSTALL_INTERFACE:${main_include_install_path}>
         )
 
-# install(TARGETS lzhlib_target EXPORT lzhlib DESTINATION ${lib_install_path} INCLUDES DESTINATION ${main_include_install_path})
 install(TARGETS lzhlib_target EXPORT lzhlib)
 install(EXPORT lzhlib DESTINATION ${lib_install_path})
 add_subdirectory("include/${PROJECT_NAME}")

@@ -5,8 +5,9 @@ project(lzhlib
 set(CMAKE_CXX_STANDARD 17)
 
 set(bin_install_path "bin")
-set(main_include_install_path "include/${PROJECT_NAME}-${PROJECT_VERSION}/${CMAKE_BUILD_TYPE}")
-set(include_install_path "${main_include_install_path}/lzhlib")
+set(main_include_install_path "include/${PROJECT_NAME}-${PROJECT_VERSION}")
+set(include_install_path "${main_include_install_path}/${CMAKE_BUILD_TYPE}")
+set(lzhlib_include_install_path "${include_install_path}/lzhlib")
 set(main_lib_install_path "lib/${PROJECT_NAME}-${PROJECT_VERSION}")
 set(lib_install_path "${main_lib_install_path}/${CMAKE_BUILD_TYPE}")
 
@@ -16,7 +17,7 @@ add_library(lzhlib_target INTERFACE)
 target_include_directories(lzhlib_target BEFORE INTERFACE
         $<BUILD_INTERFACE:${header_path}>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:${main_include_install_path}>
+        $<INSTALL_INTERFACE:${include_install_path}>
         )
 
 install(TARGETS lzhlib_target EXPORT lzhlib)

@@ -12,6 +12,6 @@ configure_file(
 )
 
 install(FILES ${stdlib_ext_headers}
-        DESTINATION ${include_install_path}/stdlib_ext
+        DESTINATION ${lzhlib_include_install_path}/stdlib_ext
         COMPONENT stdlib_ext
         )

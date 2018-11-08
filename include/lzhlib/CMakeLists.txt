@@ -4,7 +4,7 @@ configure_file(
         ${config_input}
         ${config_output}
 )
-install(FILES ${config_output} DESTINATION ${include_install_path})
+install(FILES ${config_output} DESTINATION ${lzhlib_include_install_path})
 
 add_subdirectory(graph)
 add_subdirectory(repository)

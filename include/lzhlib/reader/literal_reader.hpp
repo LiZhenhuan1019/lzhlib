@@ -61,9 +61,9 @@ namespace lzhlib
                     using from_traits = typename From::traits_type;
                     typename StringT::value_type delimiter;
                     if (from_traits::eq(str[0], '\''))
-                        from_traits::assign(delimiter, '\'');
+                        traits::assign(delimiter, '\'');
                     else if (from_traits::eq(str[0], '"'))
-                        from_traits::assign(delimiter, '"');
+                        traits::assign(delimiter, '"');
                     else
                         throw std::logic_error("expect ' or \"");
                     auto end = str.find_last_of(delimiter);
@@ -90,7 +90,7 @@ namespace lzhlib
             struct type_base<ObjectType, use_default_tag, From, std::enable_if_t<!std::is_arithmetic_v<ObjectType> && !is_string_v<ObjectType>>>;
             template <typename ObjectType, typename From>
             struct type_base<ObjectType, use_default_tag, From, std::enable_if_t<std::is_arithmetic_v<ObjectType>>>
-                : type_base<ObjectType, predefined_reader<ObjectType, reader_enum::arithmetic, From>, From>
+                : type_base<remove_cvrf_t<ObjectType>, predefined_reader<remove_cvrf_t<ObjectType>, reader_enum::arithmetic, From>, From>
             {
             };
             template <typename ObjectType, typename From>

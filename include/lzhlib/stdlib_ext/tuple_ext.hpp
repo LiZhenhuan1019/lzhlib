@@ -47,7 +47,7 @@ namespace lzhlib
             template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq, typename = std::enable_if_t<std::is_same_v<arg_helper<Index, typename remove_cvrf_t<Argument>::value_type>, remove_cvrf_t<Argument>>, void>>
             constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<1>, Argument &&argument, ArgumentSeq &&...argument_seq)
             {
-                return std::forward<typename remove_cvrf_t<Argument>::value_type &&>(argument.value);
+                return std::tuple_element_t<Index, Tuple>(std::forward<typename remove_cvrf_t<Argument>::value_type &&>(argument.value));
             }
             template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq>
             constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<0>, Argument &&argument, ArgumentSeq &&...argument_seq)

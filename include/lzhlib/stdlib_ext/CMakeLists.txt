@@ -1,5 +1,5 @@
 include(header.cmake)
-add_custom_target(verify_stdlib_ext_headers ${stdlib_ext_headers})
+add_custom_target(verify_lzhlib_stdlib_ext_headers ${stdlib_ext_headers})
 
 set(stdlib_ext_VERSION_MAJOR 0 CACHE STRING "major version" FORCE)
 set(stdlib_ext_VERSION_MINOR 1 CACHE STRING "minor version" FORCE)

@@ -1,5 +1,5 @@
-#ifndef LZHLIB_LITERAL_READER_HPP
-#define LZHLIB_LITERAL_READER_HPP
+#ifndef LZHLIB_READER_LITERAL_READER_HPP
+#define LZHLIB_READER_LITERAL_READER_HPP
 #include <string_view>
 #include <tuple>
 #include <utility>
@@ -14,6 +14,7 @@ namespace lzhlib
         {
             arithmetic,
             string,
+            user_defined
         };
         namespace detail
         {
@@ -37,15 +38,18 @@ namespace lzhlib
             template <typename T>
             constexpr auto is_string_v = is_string<T>::value;
 
-            template <typename ArithmeticT, reader_enum e, typename From = std::string_view>
-            struct predefined_reader;
+            template <typename Type, reader_enum e, typename From = std::string_view>
+            struct predefined_reader
+            {
+
+            };
             template <typename ArithmeticT, typename From>
             struct predefined_reader<ArithmeticT, reader_enum::arithmetic, From>
             {
                 ArithmeticT operator()(From str) const
                 {
                     using namespace std::literals;
-                    ArithmeticT result;
+                    ArithmeticT result{};
                     auto[ptr, error] = std::from_chars(str.data(), str.data() + str.size(), result);
                     if (ptr == str.data())
                         throw std::logic_error("expect integer, got "s + str.data());
@@ -59,7 +63,7 @@ namespace lzhlib
                 {
                     using traits = typename StringT::traits_type;
                     using from_traits = typename From::traits_type;
-                    typename StringT::value_type delimiter;
+                    typename StringT::value_type delimiter{};
                     if (from_traits::eq(str[0], '\''))
                         traits::assign(delimiter, '\'');
                     else if (from_traits::eq(str[0], '"'))
@@ -117,16 +121,18 @@ namespace lzhlib
             using from = From;
             using types = typename type_list::types;
             using readers = typename type_list::readers;
+            template <std::size_t Index>
+            using elem_t = std::tuple_element_t<Index, types>;
         public:
             template <std::size_t N>
             using type_at = std::tuple_element_t<N, types>;
             template <typename ...PassReader>
-            explicit literal_reader(PassReader ...pass_reader)
+            constexpr explicit literal_reader(PassReader ...pass_reader)
                 :readers_(lzhlib::tuple::create_tuple<readers>(std::move(pass_reader)...))
             {
             }
             template <std::size_t Index>
-            type_at<Index> read(From from)
+            constexpr type_at<Index> read(From from)
             {
                 return std::get<Index>(readers_)(from);
             }
@@ -135,4 +141,4 @@ namespace lzhlib
         };
     }
 }
-#endif //LZHLIB_LITERAL_READER_HPP
+#endif //LZHLIB_READER_LITERAL_READER_HPP

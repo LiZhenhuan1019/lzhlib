@@ -1,5 +1,5 @@
-#ifndef LZHLIB_QUEUE_HPP
-#define LZHLIB_QUEUE_HPP
+#ifndef LZHLIB_THREAD_QUEUE_HPP
+#define LZHLIB_THREAD_QUEUE_HPP
 #include <type_traits>
 #include <optional>
 #include <chrono>
@@ -126,4 +126,4 @@ namespace lzhlib
         };
     }
 }
-#endif //LZHLIB_QUEUE_HPP
+#endif //LZHLIB_THREAD_QUEUE_HPP

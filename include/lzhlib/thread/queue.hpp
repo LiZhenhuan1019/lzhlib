@@ -67,15 +67,16 @@ namespace lzhlib
                     out_value = std::move(popped->data.value());
                     return true;
                 }
-                return popped;
+                return false;
             }
+            template <typename = std::enable_if_t<std::is_nothrow_move_constructible_v<T>>>
             void push(T value)
             {
                 std::unique_ptr<node> new_node = std::make_unique<node>();
                 node *const new_tail = new_node.get();
                 {
                     std::lock_guard<std::mutex> tail_lock(tail_mutex);
-                    tail->data = std::move(value);
+                    tail->data.emplace(std::move(value));
                     tail->next = std::move(new_node);
                     tail = new_tail;
                 }

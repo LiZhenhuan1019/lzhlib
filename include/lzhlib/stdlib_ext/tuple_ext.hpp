@@ -31,20 +31,12 @@ namespace lzhlib
         }
         namespace detail
         {
-            template <std::size_t Level>
-            struct overload_level : overload_level<Level - 1>
-            {
-            };
-            template <>
-            struct overload_level<0>
-            {
-            };
             template <std::size_t Index, typename Tuple>
             constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<1>)
             {
                 return std::tuple_element_t<Index, Tuple>();
             }
-            template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq, typename = std::enable_if_t<std::is_same_v<arg_helper<Index, typename remove_cvrf_t<Argument>::value_type>, remove_cvrf_t<Argument>>, void>>
+            template <std::size_t Index, typename Tuple, typename Argument, typename ...ArgumentSeq, typename = std::enable_if_t<std::is_same_v<arg_helper<Index, typename remove_cvrf_t<Argument>::value_type>, remove_cvrf_t<Argument>>>>
             constexpr std::tuple_element_t<Index, Tuple> get_argument(overload_level<1>, Argument &&argument, ArgumentSeq &&...argument_seq)
             {
                 return std::tuple_element_t<Index, Tuple>(std::forward<typename remove_cvrf_t<Argument>::value_type &&>(argument.value));

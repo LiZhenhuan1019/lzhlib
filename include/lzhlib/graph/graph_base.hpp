@@ -3,7 +3,7 @@
 
 #include "vertex.hpp"
 #include "edge.hpp"
-#include "lzhlib/repository/dynamic_repository.hpp"
+#include "lzhlib/repository/value_repo.hpp"
 
 namespace lzhlib
 {
@@ -39,7 +39,7 @@ namespace lzhlib
         template <class ...Args>
         vertex_id add_vertex(Args &&...args)
         {
-            return vertex_id(vertex_repository.add_stock(std::in_place, std::forward<Args>(args)...));
+            return vertex_id(vertex_repository.add_object(std::in_place, std::forward<Args>(args)...));
         }
 
         pair_t associated_vertices(edge_id e) const
@@ -81,45 +81,45 @@ namespace lzhlib
 
         bool is_id_valid(vertex_id id) const
         {
-            return vertex_repository.is_id_valid(id.id());
+            return vertex_repository.is_id_used(id.id());
         }
     protected:
 
         vertex_t &get_vertex(vertex_id v)
         {
-            return vertex_repository.get_stock(v.id());
+            return vertex_repository.get_object(v.id());
         }
         vertex_t const &get_vertex(vertex_id v) const
         {
-            return vertex_repository.get_stock(v.id());
+            return vertex_repository.get_object(v.id());
         }
         edge_t &get_edge(edge_id e)
         {
-            return edge_repository.get_stock(e.id());
+            return edge_repository.get_object(e.id());
         }
         edge_t const &get_edge(edge_id e) const
         {
-            return edge_repository.get_stock(e.id());
+            return edge_repository.get_object(e.id());
         }
 
-        vertex_id to_vertex_id(stock_id i)    //preserved.Derived class don't need this just for now.
+        vertex_id to_vertex_id(object_id i)    //preserved.Derived class don't need this just for now.
         {
             return vertex_id(i);
         }
-        edge_id to_edge_id(stock_id i)
+        edge_id to_edge_id(object_id i)
         {
             return edge_id(i);
         }
-        stock_id to_stock_id(vertex_id v)
+        object_id to_stock_id(vertex_id v)
         {
             return v.id();
         }
-        stock_id to_stock_id(edge_id e)
+        object_id to_stock_id(edge_id e)
         {
             return e.id();
         }
-        dynamic_repository<vertex_t> vertex_repository;
-        dynamic_repository<edge_t> edge_repository;
+        value_repo<vertex_t> vertex_repository;
+        value_repo<edge_t> edge_repository;
         friend std::istream &operator>>(std::istream &in, graph_base &graph)
         {
             in >> graph.vertex_repository;

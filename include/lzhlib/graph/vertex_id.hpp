@@ -4,7 +4,7 @@
 #include <cstddef>    //for std::size_t
 #include <istream>
 #include <ostream>
-#include "lzhlib/repository/stock_id.hpp"
+#include "lzhlib/repository/object_id.hpp"
 
 namespace lzhlib
 {
@@ -18,7 +18,7 @@ namespace lzhlib
         class graph_base;
 
     private:
-        explicit vertex_id(stock_id i)
+        explicit vertex_id(object_id i)
             : id_(i)
         {}
     public:
@@ -40,13 +40,13 @@ namespace lzhlib
         {
             return id_;
         }
-        stock_id id_{lzhlib::invalid_id};
+        object_id id_{lzhlib::invalid_id};
 
         friend std::istream &operator>>(std::istream &in, vertex_id &id)
         {
             std::size_t i;
             in >> i;
-            id.id_ = stock_id(i);
+            id.id_ = object_id(i);
             return in;
         }
         friend std::ostream &operator<<(std::ostream &out, vertex_id id)

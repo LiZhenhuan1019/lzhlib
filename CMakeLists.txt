@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(lzhlib
-        VERSION 0.1)
+        VERSION 0.2)
 
 set(CMAKE_CXX_STANDARD 17)
 

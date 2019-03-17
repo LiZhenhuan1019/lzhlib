@@ -58,10 +58,10 @@ namespace lzhlib::test
                     }
                     auto vertices = g.associated_vertices(e0);
                     assert(vertices.first == v0 && vertices.second == v1);
-                    vector<vertex_id> vertices0 = {vertices.first, vertices.second};
-                    vector<vertex_id> vertices1;
+                    set<vertex_id> vertices0 = {vertices.first, vertices.second};
+                    set<vertex_id> vertices1;
                     for (auto v = g.first_vertex(); v != g.end_vertex(); v = g.next_vertex(v))
-                        vertices1.push_back(v);
+                        vertices1.insert(v);
                     assert(vertices0 == vertices1);
 
                     g.remove_edge(e0);
@@ -137,10 +137,10 @@ namespace lzhlib::test
                 {
                     auto vertices = g.associated_vertices(e0);
                     assert(vertices.first == v0 && vertices.second == v1);
-                    vector<vertex_id> vertices0 = {vertices.first, vertices.second};
-                    vector<vertex_id> vertices1;
+                    set<vertex_id> vertices0 = {vertices.first, vertices.second};
+                    set<vertex_id> vertices1;
                     for (auto v = g.first_vertex(); v != g.end_vertex(); v = g.next_vertex(v))
-                        vertices1.push_back(v);
+                        vertices1.insert(v);
                     assert(vertices0 == vertices1);
                 }
 

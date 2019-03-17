@@ -61,18 +61,18 @@ void test_edge()
 
 void test_vertex_repository()
 {
-    dynamic_repository<vertex<int>> r0;
-    auto i0 = r0.add_stock(std::in_place, 1);
-    assert(r0.get_stock(i0).vertex_value() == 1);
+    value_repo<vertex<int>> r0;
+    auto i0 = r0.add_object(std::in_place, 1);
+    assert(r0.get_object(i0).vertex_value() == 1);
 
-    r0.remove_stock(i0);
+    r0.remove_object(i0);
     try
     {
-        r0.get_stock(i0);
+        r0.get_object(i0);
     }
-    catch (dynamic_repository<vertex<int>>::attempt_to_use_unassigned_stock const&e)
+    catch (value_repo<vertex<int>>::attempt_to_use_unused_stock const&e)
     {
-        assert(e.what() == std::string("Attempt to use unassigned stock whose id is ") +
+        assert(e.what() == std::string("Attempt to use unused stock whose id is ") +
                            std::to_string(i0.id()) + "!");
     }
 
@@ -80,27 +80,27 @@ void test_vertex_repository()
 
 void test_vertex_edge_and_repository()
 {
-    dynamic_repository<vertex<string>> rv;
-    dynamic_repository<edge<string>> re;
+    value_repo<vertex<string>> rv;
+    value_repo<edge<string>> re;
 
-    auto vs0 = rv.add_stock(std::in_place, "a");
+    auto vs0 = rv.add_object(std::in_place, "a");
     auto v0 = vertex_id(vs0);
-    auto vs1 = rv.add_stock(std::in_place, "b");
+    auto vs1 = rv.add_object(std::in_place, "b");
     auto v1 = vertex_id(vs1);
-    auto es0 = re.add_stock(std::in_place, "a and b");
+    auto es0 = re.add_object(std::in_place, "a and b");
     auto e0 =  edge_id(es0);
 
-    rv.get_stock(vs0).add_associated_edge({e0, v1});
-    rv.get_stock(vs1).add_associated_edge({e0, v0});
-    re.get_stock(es0).set_associated_vertices(v0, v1);
+    rv.get_object(vs0).add_associated_edge({e0, v1});
+    rv.get_object(vs1).add_associated_edge({e0, v0});
+    re.get_object(es0).set_associated_vertices(v0, v1);
 
-    assert(re.get_stock(es0).is_associated(v0));
-    assert(re.get_stock(es0).is_associated(v1));
+    assert(re.get_object(es0).is_associated(v0));
+    assert(re.get_object(es0).is_associated(v1));
 
-    auto const &s0 = rv.get_stock(vs0).associated_edges();
+    auto const &s0 = rv.get_object(vs0).associated_edges();
     assert(s0.find({e0, v1}) != s0.end());
 
-    auto const &s1 = rv.get_stock(vs1).associated_edges();
+    auto const &s1 = rv.get_object(vs1).associated_edges();
     assert(s1.find({e0, v0}) != s1.end());
 }
 

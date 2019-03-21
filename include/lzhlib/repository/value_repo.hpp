@@ -10,12 +10,20 @@
 
 namespace lzhlib
 {
+    // Object pool for value-semantic object.
+    // Addresses of objects may change when adding objects because of reallocating.
+    // However the target is minimizing the occurrence of object movement.
+    // so that every object can be construct in place as it can.
     template <class ValueT>
     class value_repo
     {
         static constexpr std::size_t null_index = max_size_t_v;
         struct data_t
         {
+            template <typename ...Args>
+            data_t(Args &&...args)
+                : value(std::in_place, std::forward<Args>(args)...)
+            {}
             std::optional<ValueT> value; // invariants : (used == true) => (value.has_value() == true)
             bool used = false;
         };
@@ -57,8 +65,9 @@ namespace lzhlib
 
 
         value_repo() = default;
-        explicit value_repo(std::size_t init_size)
-            : list(init_size)
+        template <typename ...Args, std::enable_if_t<std::is_constructible_v<value_t, Args &&...>, int> = 0>
+        explicit value_repo(std::size_t init_size, Args &&...args)
+            : list(init_size, std::forward<Args>(args)...)
         {
             unused_head = list.form_list(0, init_size);
         }
@@ -108,7 +117,7 @@ namespace lzhlib
             }
             const_iterator &operator++()
             {
-                id_ = repo.get().next_stock(id_);
+                id_ = repo.get().next_id(id_);
                 return *this;
             }
             const_iterator operator++(int)
@@ -119,7 +128,7 @@ namespace lzhlib
             }
             const_iterator &operator--()
             {
-                id_ = repo.get().prev_stock(id_);
+                id_ = repo.get().prev_id(id_);
                 return *this;
             }
             const_iterator operator--(int)
@@ -162,7 +171,7 @@ namespace lzhlib
             }
             iterator &operator++()
             {
-                id_ = repo.get().next_stock(id_);
+                id_ = repo.get().next_id(id_);
                 return *this;
             }
             iterator operator++(int)
@@ -173,7 +182,7 @@ namespace lzhlib
             }
             iterator &operator--()
             {
-                id_ = repo.get().prev_stock(id_);
+                id_ = repo.get().prev_id(id_);
                 return *this;
             }
             iterator operator--(int)
@@ -229,11 +238,14 @@ namespace lzhlib
                 {
                     new_size = new_size * 3 / 2 + 1;
                 }
+                // New objects will be default constructed.
+                // Consider add a new resize function and
+                // pass in the arguments to construct new objects to support objects that cannot be default constructed.
                 list.resize(new_size);
                 unused_head = list.form_list(old_size, new_size);
             }
             std::size_t result = list.pop(unused_head);
-            list[result].value = value_t{std::forward<Args>(args)...};
+            assign_object(result, std::forward<Args>(args)...);
             list[result].used = true;
             list.push(used_head, result);
             return result;
@@ -255,15 +267,15 @@ namespace lzhlib
             list.push(unused_head, id.id());
         }
 
-        id_t first_stock() const
+        id_t first_id() const
         {
             return used_head;
         }
-        id_t end_stock() const
+        id_t end_id() const
         {
             return null_index;
         }
-        id_t next_stock(id_t current) const
+        id_t next_id(id_t current) const
         {
 #ifndef NDEBUG
             if (current.id() == null_index)
@@ -273,7 +285,7 @@ namespace lzhlib
                 return null_index;
             return list.next(current.id());
         }
-        id_t prev_stock(id_t current) const
+        id_t prev_id(id_t current) const
         {
 #ifndef NDEBUG
             if (current.id() == used_head)
@@ -300,15 +312,15 @@ namespace lzhlib
         }
         iterator begin()
         {
-            return iterator(*this, first_stock());
+            return iterator(*this, first_id());
         }
         const_iterator begin() const
         {
-            return const_iterator(*this, first_stock());
+            return const_iterator(*this, first_id());
         }
         const_iterator cbegin() const
         {
-            return const_iterator(*this, first_stock());
+            return const_iterator(*this, first_id());
         }
         iterator end()
         {
@@ -323,16 +335,47 @@ namespace lzhlib
             return const_iterator(*this, id_t{null_index});
         }
     private:
+        indexed_list<data_t> list;
+        std::size_t unused_head = null_index;
+        std::size_t used_head = null_index;
 
 
         bool check_unused(id_t id) const
         {
             return list[id.id()].used == false;
         }
-    private:
-        indexed_list<data_t> list;
-        std::size_t unused_head = null_index;
-        std::size_t used_head = null_index;
+
+        template <typename ...Args>
+        void assign_object(std::size_t index, Args &&...args)
+        {
+            // Assign/Construct the value with args.
+            //
+            // The reason not using 'list[index].value = {std::forward<Args>(args)...};'
+            // is that args may be passed to constructor of optional rather than used to construct a ValueT,
+            // for example when args is empty (in which case an empty optional will be constructed
+            // and assigned to list[index].value)
+            // or the first element of args is of type std::in_place_t,
+            // and ValueT is not of type std::in_place_t and ValueT can be constructed by the remaining part of args
+            // because a non-template copy assignment of optional has higher priority than template assignment accepting type ValueT
+            // when both of candidates do user-defined type conversion.
+            //
+            // The reason not using 'list[index].value = value_t{...};'
+            // is that extra constructing of value_t may affect performance, for example assigning char * to std::string.
+            //
+            // Consider using another optional type that has a clearer assignment
+            // so that we can use
+            // 'list[index].value = {...};' or 'list[index].value.assign(...);'
+            // to assign to or construct underlying object rather than let optional eats args.
+            if (list[index].value.has_value())
+            {
+                list[index].value.value() = {std::forward<Args>(args)...};
+            } else
+            {
+                list[index].value.emplace(std::forward<Args>(args)...);
+            }
+            if constexpr (sizeof...(args) == 1)
+                static_assert(std::is_assignable_v<ValueT &, Args...>);
+        }
 
         friend std::istream &operator>>(std::istream &in, value_repo &repository)
         {

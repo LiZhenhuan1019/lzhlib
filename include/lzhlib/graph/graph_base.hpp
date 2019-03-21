@@ -66,17 +66,17 @@ namespace lzhlib
 
         vertex_id first_vertex() const
         {
-            return vertex_id{vertex_repository.first_stock()};
+            return vertex_id{vertex_repository.first_id()};
         }
 
         vertex_id end_vertex() const
         {
-            return vertex_id{vertex_repository.end_stock()};
+            return vertex_id{vertex_repository.end_id()};
         }
 
         vertex_id next_vertex(vertex_id id) const
         {
-            return vertex_id(vertex_repository.next_stock(id.id()));
+            return vertex_id(vertex_repository.next_id(id.id()));
         }
 
         bool is_id_valid(vertex_id id) const

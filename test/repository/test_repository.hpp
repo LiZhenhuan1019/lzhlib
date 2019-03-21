@@ -49,17 +49,17 @@ namespace lzhlib::test
                 lzhlib::value_repo<std::string> repo;
                 detail::generate_discontinous_repo(repo);
 
-                lzhlib::object_id id = repo.first_stock();
+                lzhlib::object_id id = repo.first_id();
                 std::map<std::string, int> verifier{{"b", 0},
                                                     {"d", 0},
                                                     {"e", 0},
                                                     {"g", 0}};
-                for (; id != repo.end_stock(); id = repo.next_stock(id))
+                for (; id != repo.end_id(); id = repo.next_id(id))
                 {
                     verifier[repo.get_object(id)]++;
                     assert(verifier[repo.get_object(id)] == 1);
                 }
-                for (id = repo.prev_stock(repo.end_stock()); id != repo.first_stock(); id = repo.prev_stock(id))
+                for (id = repo.prev_id(repo.end_id()); id != repo.first_id(); id = repo.prev_id(id))
                 {
                     verifier[repo.get_object(id)]++;
                     assert(verifier[repo.get_object(id)] == 2);

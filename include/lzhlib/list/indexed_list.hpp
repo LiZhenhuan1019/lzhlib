@@ -10,6 +10,7 @@ namespace lzhlib
     // circular double-linked list, all nodes are allocated in a vector,
     // located by index rather than pointer,
     // so that indexes will not be invalidated by vector reallocating.
+    // Consider use another vector that supports passing arguments to ValueT when resizing so that ValueT may not be default-constructed.
     // ValueT : Object with value-semantic.
     template <typename ValueT>
     class indexed_list
@@ -23,8 +24,9 @@ namespace lzhlib
     public:
         using value_type = ValueT;
         using size_type = std::size_t;
-        explicit indexed_list(size_type size = 0, ValueT value = ValueT())
-            : data(size, node{value, null_index, null_index})
+        template <typename ...Args, std::enable_if_t<std::is_constructible_v<ValueT, Args&&...>, int> = 0>
+        explicit indexed_list(size_type size = 0, Args&&...args)
+            : data(size, node{{std::forward<Args>(args)...}, null_index, null_index})
         {
         }
         value_type &operator[](size_type index)

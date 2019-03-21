@@ -239,8 +239,8 @@ namespace lzhlib
                     new_size = new_size * 3 / 2 + 1;
                 }
                 // New objects will be default constructed.
-                // Consider add a new resize function and
-                // pass in the arguments to construct new objects to support objects that cannot be default constructed.
+                // Consider adding a new resize function and
+                // passing in the arguments to construct new objects to support objects that cannot be default constructed.
                 list.resize(new_size);
                 unused_head = list.form_list(old_size, new_size);
             }
@@ -350,16 +350,16 @@ namespace lzhlib
         {
             // Assign/Construct the value with args.
             //
-            // The reason not using 'list[index].value = {std::forward<Args>(args)...};'
+            // The reason of not using 'list[index].value = {std::forward<Args>(args)...};'
             // is that args may be passed to constructor of optional rather than used to construct a ValueT,
             // for example when args is empty (in which case an empty optional will be constructed
             // and assigned to list[index].value)
             // or the first element of args is of type std::in_place_t,
             // and ValueT is not of type std::in_place_t and ValueT can be constructed by the remaining part of args
             // because a non-template copy assignment of optional has higher priority than template assignment accepting type ValueT
-            // when both of candidates do user-defined type conversion.
+            // when both candidates perform user-defined type conversions.
             //
-            // The reason not using 'list[index].value = value_t{...};'
+            // The reason of not using 'list[index].value = value_t{...};'
             // is that extra constructing of value_t may affect performance, for example assigning char * to std::string.
             //
             // Consider using another optional type that has a clearer assignment

@@ -10,7 +10,7 @@ namespace lzhlib
     // circular double-linked list, all nodes are allocated in a vector,
     // located by index rather than pointer,
     // so that indexes will not be invalidated by vector reallocating.
-    // Consider use another vector that supports passing arguments to ValueT when resizing so that ValueT may not be default-constructed.
+    // Consider using another vector that supports passing arguments to ValueT when resizing so that ValueT may not be default-constructed.
     // ValueT : Object with value-semantic.
     template <typename ValueT>
     class indexed_list

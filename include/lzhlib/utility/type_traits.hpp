@@ -1,5 +1,5 @@
-#ifndef LZHLIB_STDLIB_EXT_TYPE_TRAITS_EXT_HPP
-#define LZHLIB_STDLIB_EXT_TYPE_TRAITS_EXT_HPP
+#ifndef LZHLIB_UTILITY_TYPE_TRAITS_EXT_HPP
+#define LZHLIB_UTILITY_TYPE_TRAITS_EXT_HPP
 #include <type_traits>
 namespace lzhlib
 {
@@ -15,4 +15,4 @@ namespace lzhlib
     {
     };
 }
-#endif //LZHLIB_STDLIB_EXT_TYPE_TRAITS_EXT_HPP
+#endif //LZHLIB_UTILITY_TYPE_TRAITS_EXT_HPP

@@ -1,0 +1,4 @@
+// This is configuration file of project lzhlib/utility processed by cmake.
+// Use "lzhlib/config/utility.hpp" to include it.
+#define LZHLIB_UTILITY_VERSION_MAJOR @utility_VERSION_MAJOR@
+#define LZHLIB_UTILITY_VERSION_MINOR @utility_VERSION_MINOR@

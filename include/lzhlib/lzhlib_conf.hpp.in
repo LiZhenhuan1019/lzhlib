@@ -1,2 +1,19 @@
 #define LZHLIB_VERSION_MAJOR @lzhlib_VERSION_MAJOR@
 #define LZHLIB_VERSION_MINOR @lzhlib_VERSION_MINOR@
+
+#include <cstdlib>
+#if __cpp_exceptions
+#define lzhlib_try      try
+#define lzhlib_catch(X) catch(X)
+#define lzhlib_throw_exception_again throw
+#define lzhlib_throw_or_abort(EXEC) (throw (EXEC))
+#define lzhlib_noexcept noexcept
+#define lzhlib_noexcept_if(COND) noexcept(COND)
+#else
+# define lzhlib_try      if (true)
+# define lzhlib_catch(X) if (false)
+# define lzhlib_throw_exception_again
+#define lzhlib_throw_or_abort(EXEC) (abort())
+#define lzhlib_noexcept
+#define lzhlib_noexcept_if(COND)
+#endif

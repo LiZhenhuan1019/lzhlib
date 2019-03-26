@@ -1,6 +1,6 @@
 add_subdirectory(graph)
 add_subdirectory(list)
 add_subdirectory(repository)
-add_subdirectory(stdlib_ext)
+add_subdirectory(utility)
 add_subdirectory(reader)
 add_subdirectory(thread)

@@ -1,10 +1,10 @@
-#ifndef LZHLIB_STDLIB_EXT_TUPLE_EXT_HPP
-#define LZHLIB_STDLIB_EXT_TUPLE_EXT_HPP
+#ifndef LZHLIB_UTILITY_TUPLE_EXT_HPP
+#define LZHLIB_UTILITY_TUPLE_EXT_HPP
 #include <tuple>
 #include <utility>
 #include <initializer_list>
-#include <lzhlib/stdlib_ext/type_traits_ext.hpp>
-//#include "lzhlib/stdlib_ext/stdlib_ext_conf.hpp"
+#include <lzhlib/utility/type_traits.hpp>
+//#include "lzhlib/utility/utility_conf.hpp"
 namespace lzhlib
 {
     namespace tuple
@@ -60,4 +60,4 @@ namespace lzhlib
         }
     }
 }
-#endif //LZHLIB_STDLIB_EXT_TUPLE_EXT_HPP
+#endif //LZHLIB_UTILITY_TUPLE_EXT_HPP

@@ -1,4 +1,0 @@
-// This is configuration file of project lzhlib/stdlib_ext processed by cmake.
-// Use "lzhlib/config/stdlib_ext.hpp" to include it.
-#define LZHLIB_STDLIB_EXT_VERSION_MAJOR @stdlib_ext_VERSION_MAJOR@
-#define LZHLIB_STDLIB_EXT_VERSION_MINOR @stdlib_ext_VERSION_MINOR@

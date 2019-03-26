@@ -2,10 +2,10 @@
 #define LZHLIB_TEST_TUPLE_EXT_HPP
 #include <vector>
 #include <cassert>
-#include "lzhlib/stdlib_ext/tuple_ext.hpp"
+#include "lzhlib/utility/tuple_ext.hpp"
 namespace lzhlib::test
 {
-    namespace stdlib_ext
+    namespace utility
     {
         namespace tuple_ext
         {

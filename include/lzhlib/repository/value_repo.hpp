@@ -365,7 +365,7 @@ namespace lzhlib
             // Consider using another optional type that has a clearer assignment
             // so that we can use
             // 'list[index].value = {...};' or 'list[index].value.assign(...);'
-            // to assign to or construct underlying object rather than let optional eats args.
+            // to assign to or construct underlying object rather than let optional eat args.
             if (list[index].value.has_value())
             {
                 list[index].value.value() = {std::forward<Args>(args)...};

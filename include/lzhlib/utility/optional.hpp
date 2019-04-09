@@ -2,6 +2,7 @@
 #define LZHLIB_UTILITY_OPTIONAL_HPP
 #include <exception>
 #include "lzhlib/lzhlib_conf.hpp"
+#include "lzhlib/utility/utility_conf.hpp"
 
 namespace lzhlib
 {

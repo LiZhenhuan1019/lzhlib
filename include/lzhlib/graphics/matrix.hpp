@@ -8,6 +8,16 @@
 
 namespace lzhlib
 {
+    // basic_matrix is a type representing matrix whose size is known at compile time.
+    // Making size of matrix known at compile time brings to us the following benefits:
+    // 1. Compile-time optimization for multiplication with matrix chain is possible, which has be implemented.
+    //    For example, assume that we have three matrices: m0 with size 30 * 35, m1 with size 35 * 15, and m2 with size 15 * 5.
+    //    Then we want to compute the multiplication of m0, m1, and m2.
+    //    If we first multiply m0 and m1, then multiply the result to m2, we have to multiply the underlying number 30 * 35 * 15 + 30 * 15 * 5 = 15825 times.
+    //    However if we first multiply m1 and m2, then multiply m0 to the result, we only have to do multiplication 35 * 15 * 5 + 30 * 35 * 5 = 7875 times.
+    //    Basic_matrix will use dynamic-programming to choose the best associativity.
+    //    Note that all the computations needed to perform this optimization is taken at compile time, so no extra overhead with dynamic-programming at run time.
+    // 2. Other compile time optimizations such as loop unrolling and auto vectorization is also possible.
     template <typename T, size_t Height, size_t Width>
     struct basic_matrix
     {
@@ -38,7 +48,7 @@ namespace lzhlib
         {
             constexpr static std::size_t number_of_matrix = NumberOfMatrix;
             constexpr static std::size_t size = NumberOfMatrix + 1;
-            size_t size_of_matrices[size];  // matrix of index i has height of size_of_matrices[i] and width of size_of_matrices[i+1]
+            size_t size_of_matrices[size];  // matrix with index i has height of size_of_matrices[i] and width of size_of_matrices[i+1]
         };
         template <std::size_t NumberOfMatrix>
         struct mult_matrix_solution
@@ -184,7 +194,6 @@ namespace lzhlib
             constexpr std::size_t split_pos = get_v<Last, get_t<First, Solution>>;
             auto left_result = multiply_matrices_helper<Solution, First, split_pos>(matrices);
             auto right_result = multiply_matrices_helper<Solution, split_pos + 1, Last>(matrices);
-#ifndef LIBLZH_ENABLE_SIMD
             result_between_t<First, Last, Matrices...> result;
             for (size_t i = 0; i < left_result.height; ++i)
                 for (size_t j = 0; j < right_result.width; ++j)
@@ -194,9 +203,6 @@ namespace lzhlib
                         result.value[i][j] += left_result.value[i][k] * right_result.value[k][j];
                 }
             return result;
-#elif
-            // TODO: implementation with SIMD
-#endif
         }
         template <typename ...Matrices>
         result_of_t<Matrices...> multiply_matrices_impl(std::tuple<Matrices const &...> const &matrices)

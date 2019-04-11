@@ -15,7 +15,7 @@ Making size of matrix known at compile time brings to us the following benefits:
 
    Then we want to compute the multiplication of m0, m1, and m2.
 
-   If we first multiply m0 and m1, then multiply the result to m2, we have to multiply the underlying number 30 * 35 * 15 + 30 * 15 * 5 = 15825 times.
+   If we first multiply m0 and m1, then multiply the result to m2, we have to multiply the underlying numbers 30 * 35 * 15 + 30 * 15 * 5 = 15825 times.
 
    However if we first multiply m1 and m2, then multiply m0 to the result, we only have to do multiplication 35 * 15 * 5 + 30 * 35 * 5 = 7875 times.
 
@@ -43,16 +43,16 @@ You can use `multiply_matrices` with arbitrary number of matrices to do matrix m
 multiply_matrices(m0, m1, m2, m3);
 ```
 
-Of course you can use `*` to multiply them, with the same semantics.
+Of course you can use `*` to multiply them, with the same semantic.
 
 ```
-basic_matrix<int 2, 3> m0;
-basic_matrix<int 3, 1> m1;
-basic_matrix<int 1, 4> m2;
+basic_matrix<int, 2, 3> m0;
+basic_matrix<int, 3, 1> m1;
+basic_matrix<int, 1, 4> m2;
 basic_matrix<int, 2, 4> result = m0 * m1 * m2;
 ```
 
-However, you must use `>> eval` at the end of multiplication chains to perform the multiplication if you want to use type deduction.
+However, you must use `>> eval` at the end of multiplication chain to perform the multiplication if you want to use type deduction.
 
 ```
 auto result = m0 * m1 * m2 >> eval; // OK, the multiplication is performed.
@@ -65,10 +65,10 @@ auto result = chain >> eval; // OK. You can use >> eval
     // to perform the computation.
 ```
 
-Also notice the danger of dangling reference when any matrix is a temporary.
+Also notice the danger of dangling reference when any input is a temporary.
 ```
 auto result = m0 * basic_matrix<int, 3, 2>{} >> eval; // OK.
-    // The computation is preformed and no reference to the temporary any more.
+    // The computation is preformed and no reference to the temporary exists any more.
 auto chain = m0 * basic_matrix<int, 3, 2>{}; // Wrong!
     // chain has a dangling reference to the temporary.
 ```

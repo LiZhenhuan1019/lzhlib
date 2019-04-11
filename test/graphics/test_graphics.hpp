@@ -188,7 +188,7 @@ namespace lzhlib::test
                      54, 8, 30, 61, 11, 20, 4, 4, 41, 14, 78, 2, 49, 84, 95, 93, 94, 41, 78, 80, 78, 49, 100, 52, 91,
                      67, 37, 44, 44, 76, 45, 31, 77, 77, 45, 50, 17, 28, 15, 18, 17, 76, 11, 82, 19, 33, 70, 41, 65, 82
                     };
-                auto result = multiply_matrices(m0, m1, m2, m3, m4, m5);
+                auto result = m0* m1* m2* m3* m4* m5 >> eval;
                 basic_matrix<std::size_t, 30, 25> expected =
                     {6550086929746957, 7007088342808033, 6566341762570177, 7825315492818720, 9263329484295744, 7760232214973308, 7376205933281258, 7951267002161605,
                      6822789794559099, 5853944125689132, 8755431613249821, 6522729836649407, 7372855826268722, 7029253891129015, 7565355038654913, 7209114644865522,
@@ -320,10 +320,12 @@ namespace lzhlib::test
                                        1};
             basic_matrix<int, 1, 3> m1{3, 2, 4};
 
-            auto result = m0 * m1 >> eval;
+            auto result1 = m0 * m1 >> eval;
+            basic_matrix<int, 2, 3> result2 = m0 * m1;
             basic_matrix<int, 2, 3> expected{6, 4, 8,
                                              3, 2, 4};
-            assert(result == expected);
+            assert(result1 == expected);
+            assert(result2 == expected);
         }
         void test()
         {

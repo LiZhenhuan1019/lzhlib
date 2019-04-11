@@ -8,6 +8,11 @@
 
 namespace lzhlib
 {
+    namespace detail
+    {
+        template <typename Expr>
+        struct is_expr_multiply;
+    }
     // basic_matrix is a type representing matrix whose size is known at compile time.
     // Making size of matrix known at compile time brings to us the following benefits:
     // 1. Compile-time optimization for multiplication with matrix chain is possible, which has be implemented.
@@ -26,7 +31,14 @@ namespace lzhlib
         constexpr static size_t columns = width;
         using value_type = T;
         std::array<std::array<value_type, width>, height> value;
+
+        template <typename Expr, std::enable_if_t<detail::is_expr_multiply<Expr>::value, int> = 0>
+        basic_matrix &operator=(Expr const &rhs)
+        {
+            *this = rhs.evaluate();
+        }
     };
+
     template <typename T>
     struct is_matrix : std::false_type
     {
@@ -139,7 +151,8 @@ namespace lzhlib
         template <typename Resolver, std::size_t ...Indices>
         constexpr auto array_to_type_impl(std::index_sequence<Indices...>)
         {
-            return integer_matrix<decltype(array_to_type_helper<Resolver, Indices>(std::make_index_sequence<Resolver::size>{}))...>{};
+            return integer_matrix<decltype(array_to_type_helper<Resolver, Indices>
+                (std::make_index_sequence<Resolver::size>{}))...>{};
         }
         template <typename Resolver>
         using array_to_type = decltype(array_to_type_impl<Resolver>(std::make_index_sequence<Resolver::size>{}));
@@ -216,7 +229,7 @@ namespace lzhlib
     {
         static_assert(std::conjunction_v<std::bool_constant<(sizeof...(Matrices) > 1)>, is_matrix<Matrices>...>);
         static_assert(detail::check_consistencies<Matrices...>());
-        return detail::multiply_matrices_impl(std::tuple<Matrices const&...>{matrices...});
+        return detail::multiply_matrices_impl(std::tuple<Matrices const &...>{matrices...});
     }
     template <typename ...Matrices>
     result_of_t<Matrices...> multiply_matrices_tuple(std::tuple<Matrices const &...> const &matrices)
@@ -234,7 +247,12 @@ namespace lzhlib
             static_assert(check_consistencies<Matrices...>());
             std::tuple<Matrices const &...> matrices;
 
-            auto evaluate() const
+            operator result_of_t<Matrices...>() const
+            {
+                return evaluate();
+            }
+
+            result_of_t<Matrices...> evaluate() const
             {
                 return multiply_matrices_tuple(matrices);
             }
@@ -251,12 +269,12 @@ namespace lzhlib
             template <typename ...Matrices, typename NewMatrix>
             auto operator()(expr_multiply<Matrices...> const &expr, NewMatrix const &new_matrix) const
             {
-                return expr_multiply<Matrices...>{std::tuple_cat(expr.matrices, std::tuple<NewMatrix const &>{new_matrix})};
+                return expr_multiply<Matrices..., NewMatrix>{std::tuple_cat(expr.matrices, std::tuple<NewMatrix const &>{new_matrix})};
             }
             template <typename ...Matrices, typename NewMatrix>
             auto operator()(NewMatrix const &new_matrix, expr_multiply<Matrices...> const &expr) const
             {
-                return expr_multiply<Matrices...>{std::tuple_cat(std::tuple<NewMatrix const &>{new_matrix}, expr.matrices)};
+                return expr_multiply<NewMatrix, Matrices...>{std::tuple_cat(std::tuple<NewMatrix const &>{new_matrix}, expr.matrices)};
             }
             template <typename ...Matrices1, typename ...Matrices2>
             auto operator()(expr_multiply<Matrices1...> const &expr1, expr_multiply<Matrices2...> const &expr2) const
@@ -265,7 +283,17 @@ namespace lzhlib
             }
         };
 
+        template <typename Expr>
+        struct is_expr_multiply : std::false_type
+        {
+        };
+        template <typename ...Matrices>
+        struct is_expr_multiply<expr_multiply<Matrices...>> : std::true_type
+        {
+        };
+
     }
+
     template <typename Lhs, typename Rhs, std::enable_if_t<std::is_invocable_v<detail::make_expr_multiply, Lhs, Rhs>, int> = 0>
     auto operator*(Lhs const &lhs, Rhs const &rhs)
     {
@@ -280,7 +308,7 @@ namespace lzhlib
         };
         struct evaluate_tag
         {
-            explicit evaluate_tag(construct_tag)
+            constexpr explicit evaluate_tag(construct_tag)
             {}
         };
     }

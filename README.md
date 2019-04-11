@@ -69,6 +69,12 @@ I actually wrote some test, built under build directory with path `test/PACKAGE_
 
 I did not use any test tool. Contributions of improving testing are welcome.
 
+## Documentation
+
+ *  [graphics.matrix](doc/graphics/matrix.md)
+
+    A matrix library.
+
 ## Authors
 
 * [Li Zhenhuan](https://gitlab.com/LiZhenhuan1019)

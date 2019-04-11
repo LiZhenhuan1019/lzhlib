@@ -1,5 +1,8 @@
 # lzhlib.graphics.matrix
 
+## Source
+
+[include/graphics/matrix.hpp](../../include/graphics/matrix.hpp)
 
 ## basic_matrix
 
@@ -55,14 +58,14 @@ However, you must use `>> eval` at the end of multiplication chains to perform t
 auto result = m0 * m1 * m2 >> eval; // OK, the multiplication is performed.
 ```
 
-Otherwise, there is only a compile time matrices chain generated.
+Otherwise, there is only a compile time matrix chain generated.
 ```
 auto chain = m0 * m1 * m2; // Wrong! No multiplication is performed.
 auto result = chain >> eval; // OK. You can use >> eval
     // to perform the computation.
 ```
 
-Also notice the danger of dangling reference when the matrices is a temporary.
+Also notice the danger of dangling reference when any matrix is a temporary.
 ```
 auto result = m0 * basic_matrix<int, 3, 2>{} >> eval; // OK.
     // The computation is preformed and no reference to the temporary any more.
@@ -70,7 +73,7 @@ auto chain = m0 * basic_matrix<int, 3, 2>{}; // Wrong!
     // chain has a dangling reference to the temporary.
 ```
 
-### Compare
+### Comparision
 
 ##### [PX4/Matrix](https://github.com/PX4/Matrix)
 

@@ -1,6 +1,7 @@
 #ifndef LZHLIB_TEST_TUPLE_EXT_HPP
 #define LZHLIB_TEST_TUPLE_EXT_HPP
 #include <vector>
+#include <string>
 #include <cassert>
 #include "lzhlib/utility/tuple_ext.hpp"
 namespace lzhlib::test

@@ -1,6 +1,7 @@
 #ifndef LZHLIB_READER_LITERAL_READER_HPP
 #define LZHLIB_READER_LITERAL_READER_HPP
 #include <string_view>
+#include <string>
 #include <tuple>
 #include <utility>
 #include <charconv>

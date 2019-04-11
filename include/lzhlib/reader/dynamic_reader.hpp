@@ -1,6 +1,7 @@
 #ifndef LZHLIB_READER_DYNAMIC_READER_HPP
 #define LZHLIB_READER_DYNAMIC_READER_HPP
 #include <string_view>
+#include <array>
 #include <optional>
 #include <functional>
 #include <lzhlib/reader/literal_reader.hpp>

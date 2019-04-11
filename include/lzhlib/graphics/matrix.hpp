@@ -15,8 +15,7 @@ namespace lzhlib
     //    Then we want to compute the multiplication of m0, m1, and m2.
     //    If we first multiply m0 and m1, then multiply the result to m2, we have to multiply the underlying number 30 * 35 * 15 + 30 * 15 * 5 = 15825 times.
     //    However if we first multiply m1 and m2, then multiply m0 to the result, we only have to do multiplication 35 * 15 * 5 + 30 * 35 * 5 = 7875 times.
-    //    Basic_matrix will use dynamic-programming to choose the best associativity.
-    //    Note that all the computations needed to perform this optimization is taken at compile time, so no extra overhead with dynamic-programming at run time.
+    //    basic_matrix will use dynamic-programming to choose the best associativity, at compile time.
     // 2. Other compile time optimizations such as loop unrolling and auto vectorization is also possible.
     template <typename T, size_t Height, size_t Width>
     struct basic_matrix

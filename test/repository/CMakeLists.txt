@@ -6,4 +6,4 @@ add_executable(test_repository
         test_repository.hpp
         test_repository.cpp
         )
-target_link_libraries(test_repository lzhlib_target)
+target_link_libraries(test_repository lzhlib)

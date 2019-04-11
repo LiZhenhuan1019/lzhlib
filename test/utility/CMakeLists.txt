@@ -6,4 +6,4 @@ add_executable(test_utility
         test_tuple_ext.hpp
         test_utility.hpp
         test_optional.hpp)
-target_link_libraries(test_utility lzhlib_target)
+target_link_libraries(test_utility lzhlib)

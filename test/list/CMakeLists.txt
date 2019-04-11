@@ -5,4 +5,4 @@ add_executable(test_list
         test_indexed_list.hpp
         test_list.cpp
         test_list.hpp)
-target_link_libraries(test_list lzhlib_target)
+target_link_libraries(test_list lzhlib)

@@ -4,7 +4,7 @@ include(${header_path}/lzhlib/repository/header.cmake)
 add_executable(test_graph
         ${graph_headers}
         ${repository_headers}
-        test_graphics.cpp
+        test_graph.cpp
         white_box_test.cpp
         white_box_test.hpp )
-target_link_libraries(test_graph lzhlib_target)
+target_link_libraries(test_graph lzhlib)

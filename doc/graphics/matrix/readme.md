@@ -21,6 +21,54 @@ Making size of matrix known at compile time brings to us the following benefits:
 2. Other compile time optimizations such as loop unrolling and auto vectorization is also possible.
 
 
+### Usage
+You can create a matrix and initialize it using list initialization like this:
+
+```
+basic_matrix<int, 2, 3> m0{
+        0, 1, 2,
+        3, 4, 5};
+```
+
+The first template argument indicates the underlying number.
+
+The second and third template arguments indicate the number of row(height) and column(width) of the matrix, respecitvely.
+
+You can use `multiply_matrices` with arbitrary number of matrices to do matrix multiplication, with the benefit of compile time optimization of associativity.
+
+```
+multiply_matrices(m0, m1, m2, m3);
+```
+
+Of course you can use `*` to multiply them, with the same semantics.
+
+```
+basic_matrix<int 2, 3> m0;
+basic_matrix<int 3, 1> m1;
+basic_matrix<int 1, 4> m2;
+basic_matrix<int, 2, 4> result = m0 * m1 * m2;
+```
+
+However, you must use `>> eval` at the end of multiplication chains to perform the multiplication if you want to use type deduction.
+
+```
+auto result = m0 * m1 * m2 >> eval; // OK, the multiplication is performed.
+```
+
+Otherwise, there is only a compile time matrices chain generated.
+```
+auto chain = m0 * m1 * m2; // Wrong! No multiplication is performed.
+auto result = chain >> eval; // OK. You can use >> eval
+    // to perform the computation.
+```
+
+Also notice the danger of dangling reference when the matrices is a temporary.
+```
+auto result = m0 * basic_matrix<int, 3, 2>{} >> eval; // OK.
+    // The computation is preformed and no reference to the temporary any more.
+auto chain = m0 * basic_matrix<int, 3, 2>{}; // Wrong!
+    // chain has a dangling reference to the temporary.
+```
 
 ### Compare
 

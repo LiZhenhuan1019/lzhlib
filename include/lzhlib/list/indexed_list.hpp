@@ -24,8 +24,9 @@ namespace lzhlib
     public:
         using value_type = ValueT;
         using size_type = std::size_t;
+        indexed_list() = default;
         template <typename ...Args, std::enable_if_t<std::is_constructible_v<ValueT, Args&&...>, int> = 0>
-        explicit indexed_list(size_type size = 0, Args&&...args)
+        explicit indexed_list(size_type size, Args&&...args)
             : data(size, node{{std::forward<Args>(args)...}, null_index, null_index})
         {
         }

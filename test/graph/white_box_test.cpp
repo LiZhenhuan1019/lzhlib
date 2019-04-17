@@ -62,7 +62,7 @@ void test_edge()
 void test_vertex_repository()
 {
     value_repo<vertex<int>> r0;
-    auto i0 = r0.add_object(std::in_place, 1);
+    auto i0 = r0.assign_object(std::in_place, 1);
     assert(r0.get_object(i0).vertex_value() == 1);
 
     r0.remove_object(i0);
@@ -83,11 +83,11 @@ void test_vertex_edge_and_repository()
     value_repo<vertex<string>> rv;
     value_repo<edge<string>> re;
 
-    auto vs0 = rv.add_object(std::in_place, "a");
+    auto vs0 = rv.assign_object(std::in_place, "a");
     auto v0 = vertex_id(vs0);
-    auto vs1 = rv.add_object(std::in_place, "b");
+    auto vs1 = rv.assign_object(std::in_place, "b");
     auto v1 = vertex_id(vs1);
-    auto es0 = re.add_object(std::in_place, "a and b");
+    auto es0 = re.assign_object(std::in_place, "a and b");
     auto e0 =  edge_id(es0);
 
     rv.get_object(vs0).add_associated_edge({e0, v1});

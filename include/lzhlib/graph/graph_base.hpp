@@ -39,7 +39,7 @@ namespace lzhlib
         template <class ...Args>
         vertex_id add_vertex(Args &&...args)
         {
-            return vertex_id(vertex_repository.add_object(std::in_place, std::forward<Args>(args)...));
+            return vertex_id(vertex_repository.assign_object(std::in_place, std::forward<Args>(args)...));
         }
 
         pair_t associated_vertices(edge_id e) const

@@ -2,7 +2,7 @@
 
 ## Source
 
-[include/graphics/matrix.hpp](../../include/lzhlib/graphics/matrix.hpp)
+[include/lzhlib/graphics/matrix.hpp](../../include/lzhlib/graphics/matrix.hpp)
 
 ## basic_matrix
 
@@ -60,7 +60,7 @@ auto result = m0 * m1 * m2 >> eval; // OK, the multiplication is performed.
 
 Otherwise, there is only a compile time matrix chain generated.
 ```
-auto chain = m0 * m1 * m2; // Wrong! No multiplication is performed.
+auto chain = m0 * m1 * m2; // No multiplication is performed, which may not be what you expect.
 auto result = chain >> eval; // OK. You can use >> eval
     // to perform the computation.
 ```
@@ -77,7 +77,7 @@ auto chain = m0 * basic_matrix<int, 3, 2>{}; // Wrong!
 
 ##### [PX4/Matrix](https://github.com/PX4/Matrix)
 
-[PX4/Matrix](https://github.com/PX4/Matrix) has more feature than `lzhlib.graphics.matrix` for now.
+[PX4/Matrix](https://github.com/PX4/Matrix) is also a fixed size matrix which has more feature than `lzhlib.graphics.matrix` for now.
 
 However, because `lzhlib.graphics.matrix` has optimization for multiplication of matrix chain, it runs faster than [PX4/Matrix](https://github.com/PX4/Matrix) and in some circumstance it's 4 times faster.
 

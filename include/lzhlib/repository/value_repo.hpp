@@ -20,6 +20,7 @@ namespace lzhlib
         static constexpr std::size_t null_index = max_size_t_v;
         struct data_t
         {
+            data_t() = default;
             template <typename ...Args>
             data_t(Args &&...args)
                 : value(std::in_place, std::forward<Args>(args)...)
@@ -229,7 +230,14 @@ namespace lzhlib
             return *list[id.id()].value;
         }
         template <class ...Args>
-        id_t add_object(Args &&... args)
+        id_t assign_object(Args &&... args)
+        {
+
+            auto result = reuse_object();
+            assign_object_impl(result.id(), std::forward<Args>(args)...);
+            return result;
+        }
+        id_t reuse_object()
         {
             if (unused_head == null_index)
             {
@@ -238,14 +246,10 @@ namespace lzhlib
                 {
                     new_size = new_size * 3 / 2 + 1;
                 }
-                // New objects will be default constructed.
-                // Consider adding a new resize function and
-                // passing in the arguments to construct new objects to support objects that cannot be default constructed.
                 list.resize(new_size);
                 unused_head = list.form_list(old_size, new_size);
             }
             std::size_t result = list.pop(unused_head);
-            assign_object(result, std::forward<Args>(args)...);
             list[result].used = true;
             list.push(used_head, result);
             return result;
@@ -346,7 +350,7 @@ namespace lzhlib
         }
 
         template <typename ...Args>
-        void assign_object(std::size_t index, Args &&...args)
+        void assign_object_impl(std::size_t index, Args &&...args)
         {
             // Assign/Construct the value with args.
             //

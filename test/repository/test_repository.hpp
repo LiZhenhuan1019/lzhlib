@@ -14,14 +14,14 @@ namespace lzhlib::test
             {
                 void generate_discontinous_repo(lzhlib::value_repo<std::string> &repo)
                 {
-                    auto a = repo.add_object("a");
-                    repo.add_object("b");
-                    auto c = repo.add_object("c");
-                    repo.add_object("d");
-                    repo.add_object("e");
-                    auto e = repo.add_object("f");
-                    repo.add_object("g");
-                    auto h = repo.add_object("h");
+                    auto a = repo.assign_object("a");
+                    repo.assign_object("b");
+                    auto c = repo.assign_object("c");
+                    repo.assign_object("d");
+                    repo.assign_object("e");
+                    auto e = repo.assign_object("f");
+                    repo.assign_object("g");
+                    auto h = repo.assign_object("h");
                     repo.remove_object(a);
                     repo.remove_object(c);
                     repo.remove_object(e);
@@ -33,8 +33,8 @@ namespace lzhlib::test
             {
                 lzhlib::value_repo<std::string> repo;
 
-                auto s0 = repo.add_object("a");
-                auto s1 = repo.add_object("b");
+                auto s0 = repo.assign_object("a");
+                auto s1 = repo.assign_object("b");
 
                 assert(repo.get_object(s0) == "a");
                 assert(repo.get_object(s1) == "b");

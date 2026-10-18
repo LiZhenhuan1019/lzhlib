@@ -47,12 +47,25 @@ jobs:
         run: ctest --test-dir build --output-on-failure
 
   sanitizers:
-    name: ${{ matrix.sanitizer }} (gcc, C++17)
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # Sanitizer runtimes fight with the 32 bit ASLR entropy of newer kernels
+      # ("DEADLYSIGNAL" spam from ASan, "unexpected memory mapping" from TSan),
+      # so the tests are started through `setarch -R`.
       matrix:
-        sanitizer: [address, thread]
+        include:
+          # ASan catches use-after-free / out-of-bounds / leaks, UBSan catches
+          # signed overflow, invalid casts and friends. Both are compiled into
+          # the same binary.
+          - name: ASan + UBSan (gcc, C++17)
+            flags: -fsanitize=address,undefined
+            ctest_cmd: setarch $(uname -m) -R ctest
+          # TSan reports data races.
+          - name: TSan (gcc, C++17)
+            flags: -fsanitize=thread
+            ctest_cmd: setarch $(uname -m) -R ctest
     steps:
       - uses: actions/checkout@v4
 
@@ -67,8 +80,8 @@ jobs:
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_STANDARD=17 \
             -DLZHLIB_BUILD_GTEST=ON \
-            -DCMAKE_CXX_FLAGS="-fsanitize=${{ matrix.sanitizer }} -fno-omit-frame-pointer -fno-sanitize-recover=all" \
-            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=${{ matrix.sanitizer }}"
+            -DCMAKE_CXX_FLAGS="${{ matrix.flags }} -fno-omit-frame-pointer -fno-sanitize-recover=all" \
+            -DCMAKE_EXE_LINKER_FLAGS="${{ matrix.flags }}"
 
       - name: Build
         run: cmake --build build --target lzhlib_unit_tests
@@ -76,5 +89,6 @@ jobs:
       - name: Test
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
           TSAN_OPTIONS: halt_on_error=1
-        run: ctest --test-dir build --output-on-failure
+        run: ${{ matrix.ctest_cmd }} --test-dir build --output-on-failure

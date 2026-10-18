@@ -91,6 +91,11 @@ reference; they do not depend on GoogleTest.
  * GCC and Clang, C++17 and C++20, Debug, plus one optimized Release configuration (`NDEBUG`);
  * ASan + UBSan and TSan builds, so memory errors, UB and data races fail the build.
 
+Both sanitizer jobs start the tests through `setarch $(uname -m) -R`: the sanitizer runtimes
+do not cope with the 32 bit ASLR entropy some kernels use (ASan dies with `DEADLYSIGNAL`,
+TSan with `unexpected memory mapping`). Use the same prefix when running these builds locally
+on WSL or on a distribution that ships such a kernel.
+
 ## Design notes
 
 ### `indexed_list`: links stored as indices, nodes stored contiguously

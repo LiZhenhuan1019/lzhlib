@@ -3,6 +3,7 @@
 #include <vector>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 namespace lzhlib
 {
@@ -12,14 +13,20 @@ namespace lzhlib
     // so that indexes will not be invalidated by vector reallocating.
     // Consider using another vector that supports passing arguments to ValueT when resizing so that ValueT may not be default-constructed.
     // ValueT : Object with value-semantic.
+    //
+    // A node that is not linked into a list has both links equal to null_index;
+    // resize() appends such unlinked nodes, form_list() / push() link them.
     template <typename ValueT>
     class indexed_list
     {
         struct node
         {
             ValueT value;
-            std::size_t next;
-            std::size_t prev;
+            // Without these initializers a node appended by resize() would be
+            // value-initialized, i.e. its links would be 0 instead of null_index,
+            // and walking "forward" from it would silently step into node 0.
+            std::size_t next = null_index;
+            std::size_t prev = null_index;
         };
     public:
         using value_type = ValueT;
@@ -40,10 +47,12 @@ namespace lzhlib
         }
         value_type &at(size_type index)
         {
+            check_index(index);
             return data[index].value;
         }
         value_type const &at(size_type index) const
         {
+            check_index(index);
             return data[index].value;
         }
         size_type size() const
@@ -63,9 +72,8 @@ namespace lzhlib
         // returns the head of list.
         size_type form_list(size_type begin, size_type end)
         {
-            if (end <= begin || end == 0 || begin == std::numeric_limits<std::size_t>::max() ||
-                end > data.size())
-                throw std::invalid_argument("in lzhlib::value_repo::form_list: argument is invalid.");
+            if (end <= begin || begin == null_index || end > data.size())
+                throw std::invalid_argument("in lzhlib::indexed_list::form_list: argument is invalid.");
             data[begin].next = begin + 1;
             data[end - 1].prev = end - 2;
             for (std::size_t i = begin + 1; i < end - 1; ++i)
@@ -134,6 +142,15 @@ namespace lzhlib
         }
     private:
         std::vector<node> data;
+
+        // at() is the checked accessor, operator[] stays unchecked on purpose:
+        // the list is used in loops where the index is known to be valid.
+        void check_index(size_type index) const
+        {
+            if (index >= data.size())
+                throw std::out_of_range("in lzhlib::indexed_list::at: index " + std::to_string(index) +
+                                        " is out of range, size is " + std::to_string(data.size()) + ".");
+        }
 
         size_type push_impl(size_type &head, size_type index)
         {

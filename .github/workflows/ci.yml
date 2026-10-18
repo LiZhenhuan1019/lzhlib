@@ -46,6 +46,39 @@ jobs:
       - name: Test
         run: ctest --test-dir build --output-on-failure
 
+  warnings:
+    name: warnings as errors (${{ matrix.cxx }}, C++20)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { compiler: gcc, cxx: g++ }
+          - { compiler: clang, cxx: clang++ }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+
+      - name: Configure
+        env:
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DLZHLIB_BUILD_GTEST=ON \
+            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror"
+
+      - name: Build
+        run: cmake --build build --target lzhlib_unit_tests
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
   sanitizers:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest

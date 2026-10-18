@@ -5,6 +5,10 @@
 #include <vector>     //for std::vector
 #include <functional>
 #include <optional>
+#include <cstddef>
+#include <iterator>
+#include <limits>
+#include <string>
 #include <lzhlib/list/indexed_list.hpp>
 #include "object_id.hpp"
 
@@ -33,12 +37,15 @@ namespace lzhlib
         using id_t = object_id;
         using opt_t = std::optional<value_t>;
 
-        struct size_to_large : public std::invalid_argument
+        // The class used to be spelled size_to_large; that misspelling is kept as an
+        // alias below so that existing user code still compiles.
+        struct size_too_large : public std::invalid_argument
         {
-            explicit size_to_large(std::size_t size)
-                : invalid_argument(std::string("Size of ") + std::to_string(size) + " is to large.")
+            explicit size_too_large(std::size_t size)
+                : invalid_argument(std::string("Size of ") + std::to_string(size) + " is too large.")
             {}
         };
+        using size_to_large = size_too_large;
         class attempt_to_use_unused_stock : public std::logic_error
         {
         public:
@@ -56,11 +63,19 @@ namespace lzhlib
                               std::to_string(id.id()) + "!")
             {}
         };
+        class attempt_to_return_unused_stock : public std::logic_error
+        {
+        public:
+            explicit attempt_to_return_unused_stock(id_t id)
+                : logic_error(std::string("Attempt to return unused stock whose id is ") +
+                              std::to_string(id.id()) + "!")
+            {}
+        };
         class index_out_of_range : public std::out_of_range
         {
         public:
             explicit index_out_of_range(id_t id)
-                : out_of_range(std::string("index with value ") + std::to_string(id.id()) + "is out of range.")
+                : out_of_range(std::string("index with value ") + std::to_string(id.id()) + " is out of range.")
             {}
         };
 
@@ -228,28 +243,21 @@ namespace lzhlib
         //id_ interface
         value_t &get_object(id_t id)
         {
-#ifndef NDEBUG
+            check_index(id);
             if (check_unused(id))
-            {
                 throw attempt_to_use_unused_stock(id);
-            }
-#endif // NDEBUG
             return *list[id.id()].value;
         }
         value_t const &get_object(id_t id) const
         {
-#ifndef NDEBUG
+            check_index(id);
             if (check_unused(id))
-            {
                 throw attempt_to_use_unused_stock(id);
-            }
-#endif // NDEBUG
             return *list[id.id()].value;
         }
         template <class ...Args>
         id_t assign_object(Args &&... args)
         {
-
             auto result = reuse_object();
             assign_object_impl(result.id(), std::forward<Args>(args)...);
             return result;
@@ -257,15 +265,7 @@ namespace lzhlib
         id_t reuse_object()
         {
             if (unused_head == null_index)
-            {
-                std::size_t new_size = list.size(), old_size = new_size;
-                if (new_size < std::numeric_limits<std::size_t>::max() / 3 * 2)
-                {
-                    new_size = new_size * 3 / 2 + 1;
-                }
-                list.resize(new_size);
-                unused_head = list.form_list(old_size, new_size);
-            }
+                grow();
             std::size_t result = list.pop(unused_head);
             list[result].used = true;
             list.push(used_head, result);
@@ -273,16 +273,18 @@ namespace lzhlib
         }
         void remove_object(id_t id)
         {
-#ifndef NDEBUG
+            check_index(id);
             if (check_unused(id))
                 throw attempt_to_remove_nonexistent_stock(id);
-#endif // NDEBUG
             list[id.id()].value.reset();
             return_object(id);
         }
         // make object of id unused without destroying it.
         void return_object(id_t id)
         {
+            check_index(id);
+            if (check_unused(id))
+                throw attempt_to_return_unused_stock(id);
             list[id.id()].used = false;
             list.remove(used_head, id.id());
             list.push(unused_head, id.id());
@@ -298,22 +300,18 @@ namespace lzhlib
         }
         id_t next_id(id_t current) const
         {
-#ifndef NDEBUG
-            if (current.id() == null_index)
-                throw index_out_of_range(current);
-#endif // NDEBUG
+            check_index(current);
             if (current.id() == list.previous(used_head))
                 return null_index;
             return list.next(current.id());
         }
         id_t prev_id(id_t current) const
         {
-#ifndef NDEBUG
-            if (current.id() == used_head)
-                throw index_out_of_range(current);
-#endif // NDEBUG
             if (current.id() == null_index)
                 return list.previous(used_head);
+            check_index(current);
+            if (current.id() == used_head)
+                throw index_out_of_range(current);
             return list.previous(current.id());
         }
 
@@ -360,6 +358,29 @@ namespace lzhlib
         std::size_t unused_head = null_index;
         std::size_t used_head = null_index;
 
+
+        // Contract checks are unconditional on purpose: they must not disappear when
+        // NDEBUG is defined, otherwise an optimized build indexes the vector out of
+        // bounds (undefined behaviour) instead of throwing.
+        void check_index(id_t id) const
+        {
+            if (id.id() >= list.size())
+                throw index_out_of_range(id);
+        }
+
+        // Grows the storage by 1.5x, the same policy as std::vector, and returns the
+        // appended slots to the free list.
+        void grow()
+        {
+            const std::size_t old_size = list.size();
+            const std::size_t max_size = std::numeric_limits<std::size_t>::max();
+            // old_size + old_size / 2 + 1 must not wrap around.
+            if (old_size > (max_size - 1) / 3 * 2)
+                throw size_too_large(old_size);
+            const std::size_t new_size = old_size + old_size / 2 + 1;
+            list.resize(new_size);
+            unused_head = list.form_list(old_size, new_size);
+        }
 
         bool check_unused(id_t id) const
         {

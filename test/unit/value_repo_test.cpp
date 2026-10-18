@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -134,15 +135,64 @@ TEST(value_repo, iterators_are_comparable_across_constness)
     EXPECT_TRUE(cursor == repo.cend());
 }
 
-TEST(value_repo, accessing_unused_slot_throws_in_debug_builds)
+// The contract checks are unconditional, so this test is meaningful in Release
+// builds too (it used to be compiled out with NDEBUG, and an optimized build
+// simply read past the end of the storage).
+TEST(value_repo, accessing_unused_slot_throws_in_every_build_configuration)
 {
     value_repo<int> repo(1);
     auto id = repo.assign_object(1);
     repo.remove_object(id);
 
-#ifndef NDEBUG
     EXPECT_THROW(repo.get_object(id), std::logic_error);
-#else
-    SUCCEED();
-#endif
+}
+
+TEST(value_repo, out_of_range_ids_throw_instead_of_indexing_past_the_storage)
+{
+    value_repo<int> repo(2);
+    repo.assign_object(1);
+
+    lzhlib::object_id invalid{9};
+    EXPECT_FALSE(repo.is_id_used(invalid));
+    EXPECT_THROW(repo.get_object(invalid), std::out_of_range);
+    EXPECT_THROW(repo.remove_object(invalid), std::out_of_range);
+    EXPECT_THROW(repo.return_object(invalid), std::out_of_range);
+    EXPECT_THROW(repo.next_id(invalid), std::out_of_range);
+    EXPECT_THROW(repo.next_id(lzhlib::object_id{}), std::out_of_range);
+}
+
+TEST(value_repo, returning_an_unused_slot_twice_throws)
+{
+    value_repo<int> repo(1);
+    auto id = repo.assign_object(1);
+    repo.return_object(id);
+
+    EXPECT_THROW(repo.return_object(id), std::logic_error);
+    EXPECT_THROW(repo.remove_object(id), std::logic_error);
+}
+
+TEST(value_repo, growth_appends_free_slots_without_corrupting_the_free_list)
+{
+    value_repo<int> repo(1);
+    std::vector<lzhlib::object_id> ids;
+    for (int i = 0; i < 20; ++i)
+        ids.push_back(repo.assign_object(i));
+
+    // every other slot goes back to the free list, so the used list has to be
+    // spliced out of the middle of the circular list 10 times
+    for (std::size_t i = 0; i < ids.size(); i += 2)
+        repo.remove_object(ids[i]);
+
+    int live = 0;
+    for (auto const &value : repo)
+    {
+        EXPECT_EQ(value % 2, 1);
+        ++live;
+    }
+    EXPECT_EQ(live, 10);
+
+    // the recycled slots are handed out again and keep a consistent used list
+    auto reused = repo.assign_object(-1);
+    EXPECT_TRUE(repo.is_id_used(reused));
+    EXPECT_EQ(repo.get_object(reused), -1);
 }

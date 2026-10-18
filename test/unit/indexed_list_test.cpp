@@ -24,7 +24,7 @@ TEST(indexed_list, push_builds_circular_list_in_reverse_insertion_order)
         list.push(head, i);
         EXPECT_EQ(head, i);
         EXPECT_EQ(list.next(i), i == 0 ? 0 : old_head);
-        EXPECT_EQ(list.previous(i), 0);
+        EXPECT_EQ(list.previous(i), std::size_t{0});
     }
 }
 
@@ -127,9 +127,15 @@ TEST(indexed_list, form_list_links_a_contiguous_range)
 TEST(indexed_list, form_list_rejects_invalid_ranges)
 {
     indexed_list<int> list(4);
-    EXPECT_THROW(list.form_list(2, 2), std::invalid_argument);
-    EXPECT_THROW(list.form_list(3, 2), std::invalid_argument);
-    EXPECT_THROW(list.form_list(0, 5), std::invalid_argument);
+    EXPECT_THROW(list.form_list(2, 2), std::invalid_argument);  // empty range
+    EXPECT_THROW(list.form_list(3, 2), std::invalid_argument);  // reversed range
+    EXPECT_THROW(list.form_list(null_index, 1), std::invalid_argument);
+
+    // The size is read through volatile on purpose: with a constant 4, GCC 12 at
+    // -O3 proves that the range below is invalid and reports a bogus
+    // -Warray-bounds for the accesses that the throw makes unreachable.
+    volatile std::size_t const size = list.size();
+    EXPECT_THROW(list.form_list(0, size + 1), std::invalid_argument);  // past the end
 }
 
 TEST(indexed_list, clear_unlinks_every_node)
@@ -153,4 +159,46 @@ TEST(indexed_list, null_index_is_propagated)
     indexed_list<int> list(4);
     EXPECT_EQ(list.next(null_index), null_index);
     EXPECT_EQ(list.previous(null_index), null_index);
+}
+
+// resize() appends value-initialized nodes; their links must stay null_index so
+// that an unlinked node cannot be mistaken for the head of a list.
+TEST(indexed_list, nodes_appended_by_resize_are_not_linked)
+{
+    indexed_list<int> list(2);
+    list.resize(5);
+
+    ASSERT_EQ(list.size(), 5u);
+    for (std::size_t i = 2; i < 5; ++i)
+    {
+        EXPECT_EQ(list.next(i), null_index);
+        EXPECT_EQ(list.previous(i), null_index);
+    }
+}
+
+TEST(indexed_list, resize_keeps_the_links_of_the_existing_nodes)
+{
+    indexed_list<int> list(4);
+    std::size_t head = list.form_list(0, 4);
+    list.resize(8);
+
+    EXPECT_EQ(head, 0);
+    EXPECT_EQ(list.next(0), 1);
+    EXPECT_EQ(list.previous(1), 0);
+    EXPECT_EQ(list.previous(0), 3);
+    EXPECT_EQ(list.next(3), 0);
+}
+
+TEST(indexed_list, at_is_checked_while_operator_subscript_is_not)
+{
+    indexed_list<int> list(2);
+    list.at(1) = 7;
+    EXPECT_EQ(list.at(1), 7);
+
+    EXPECT_THROW(list.at(2), std::out_of_range);
+    EXPECT_THROW(list.at(null_index), std::out_of_range);
+
+    indexed_list<int> const &const_list = list;
+    EXPECT_EQ(const_list.at(1), 7);
+    EXPECT_THROW(const_list.at(2), std::out_of_range);
 }

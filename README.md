@@ -89,11 +89,14 @@ reference; they do not depend on GoogleTest.
 `.github/workflows/ci.yml` runs on every push and pull request:
 
  * GCC and Clang, C++17 and C++20, Debug, plus one optimized Release configuration (`NDEBUG`);
+ * a warnings-as-errors job (`-Wall -Wextra -Wpedantic -Werror`) with GCC and Clang, so a header
+   that starts to warn fails CI instead of silently annoying users;
  * ASan + UBSan and TSan builds, so memory errors, UB and data races fail the build.
 
 The Release job is there on purpose: `assert` is compiled out under `NDEBUG`, so assertions have to
 live inside the test framework, and the library itself states its contracts with `static_assert`
 and exceptions instead of relying on runtime checks that disappear in optimized builds.
+`value_repo` and `indexed_list::at` therefore throw in every build configuration (see below).
 
 Both sanitizer jobs start the tests through `setarch $(uname -m) -R`: the sanitizer runtimes
 do not cope with the 32 bit ASLR entropy some kernels use (ASan dies with `DEADLYSIGNAL`,
@@ -114,6 +117,9 @@ indices (`prev` / `next`) into a doubly linked circular list. `head` is owned by
   rewritten and no element is shifted.
 * The price: indices are not type safe, a stale index cannot be detected, and a node can only
   belong to one list at a time.
+* `resize()` appends unlinked nodes (`next == prev == null_index`) and `form_list(begin, end)` links a
+  contiguous range into a ring - that is how `value_repo` builds its free list. `operator[]` is
+  unchecked, `at()` throws `std::out_of_range`.
 
 ### `value_repo`: an object pool with value semantics
 
@@ -126,7 +132,26 @@ indices (`prev` / `next`) into a doubly linked circular list. `head` is owned by
 * iteration walks the used list only, so it is O(live) rather than O(capacity).
 
 The invariant is `used == true` implies `value.has_value() == true`; addresses are not stable
-across growth.
+across growth. Every id is range checked before it touches the storage, and using an unused,
+removed or out-of-range id throws (`attempt_to_use_unused_stock`,
+`attempt_to_remove_nonexistent_stock`, `attempt_to_return_unused_stock`, `index_out_of_range`) in
+Debug *and* Release builds.
+
+### `thread::queue` and `thread::thread_pool`: shutdown without polling
+
+`queue<T>` is the classic "mutex on the tail, cheap push" queue: several producers may push
+concurrently, consumers wait on a condition variable.
+
+* `close()` wakes every blocked consumer and makes `push()` throw `queue_closed`; elements that are
+  already queued can still be popped.
+* `wait_and_pop(T &)` returns `false` once a closed queue is drained and the value returning
+  overload throws `queue_closed`, so `while (queue.wait_and_pop(value)) ...` terminates by itself.
+* timeouts use `wait_for` on a steady clock, so a wall clock jump cannot stretch them.
+
+`thread_pool` builds on that: `stop()` closes the queue, lets the workers drain the backlog, then
+joins them, so queued tasks are not lost and the destructor does not need a polling loop. `stop()`
+is idempotent and `submit()` throws `thread_pool_stopped` afterwards, which turns the classic
+"task submitted into a pool that is already shutting down" hang into an exception.
 
 ### `graphics::matrix`: expression templates and compile time associativity
 

@@ -91,6 +91,10 @@ reference; they do not depend on GoogleTest.
  * GCC and Clang, C++17 and C++20, Debug, plus one optimized Release configuration (`NDEBUG`);
  * ASan + UBSan and TSan builds, so memory errors, UB and data races fail the build.
 
+The Release job is there on purpose: `assert` is compiled out under `NDEBUG`, so assertions have to
+live inside the test framework, and the library itself states its contracts with `static_assert`
+and exceptions instead of relying on runtime checks that disappear in optimized builds.
+
 Both sanitizer jobs start the tests through `setarch $(uname -m) -R`: the sanitizer runtimes
 do not cope with the 32 bit ASLR entropy some kernels use (ASan dies with `DEADLYSIGNAL`,
 TSan with `unexpected memory mapping`). Use the same prefix when running these builds locally

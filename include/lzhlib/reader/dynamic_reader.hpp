@@ -61,7 +61,7 @@ namespace lzhlib
             };
             template <std::size_t Index>
             friend
-            class dynamic_reader::assignment;
+            struct dynamic_reader::assignment;
             using assignments_t = std::array<std::function<void(from)>, size>;
             template <std::size_t ...Indices>
             assignments_t create_assignments(std::index_sequence<Indices...>)

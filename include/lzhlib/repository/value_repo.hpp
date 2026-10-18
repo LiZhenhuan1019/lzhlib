@@ -1,14 +1,16 @@
 #ifndef LZHLIB_REPOSITORY_VALUE_REPO_HPP
 #define LZHLIB_REPOSITORY_VALUE_REPO_HPP
 
-#include <stdexcept>  //for std::out_of_range
-#include <vector>     //for std::vector
-#include <functional>
-#include <optional>
 #include <cstddef>
+#include <functional>
+#include <istream>    //for the friend operator>>
 #include <iterator>
 #include <limits>
+#include <optional>
+#include <ostream>    //for the friend operator<<
+#include <stdexcept>  //for std::out_of_range
 #include <string>
+#include <vector>     //for std::vector
 #include <lzhlib/list/indexed_list.hpp>
 #include "object_id.hpp"
 

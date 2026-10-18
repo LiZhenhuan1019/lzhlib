@@ -75,8 +75,11 @@ missing (the first configure then needs network access):
     cmake --build build-debug --target lzhlib_unit_tests
     ctest --test-dir build-debug --output-on-failure
 
-The older hand written checks under `test/<package>/` are still built by default and kept for
-reference; they do not depend on GoogleTest.
+The older hand written checks under `test/<package>/` are still built by default and registered
+with `ctest` as well, so the command above runs both suites; they do not depend on GoogleTest.
+They check their conditions with `LZH_TEST_CHECK` (`test/test_check.hpp`), which is evaluated in
+every configuration: a plain `assert` disappears as soon as `NDEBUG` is defined, and a Release
+build would then report success without having tested anything.
 
 ### Running the micro benchmarks
 
@@ -89,8 +92,8 @@ reference; they do not depend on GoogleTest.
 `.github/workflows/ci.yml` runs on every push and pull request:
 
  * GCC and Clang, C++17 and C++20, Debug, plus one optimized Release configuration (`NDEBUG`);
- * a warnings-as-errors job (`-Wall -Wextra -Wpedantic -Werror`) with GCC and Clang, so a header
-   that starts to warn fails CI instead of silently annoying users;
+ * a warnings-as-errors job (`-Wall -Wextra -Wpedantic -Werror`) with GCC and Clang, in Debug and
+   in Release, so a header that starts to warn fails CI instead of silently annoying users;
  * ASan + UBSan and TSan builds, so memory errors, UB and data races fail the build.
 
 The Release job is there on purpose: `assert` is compiled out under `NDEBUG`, so assertions have to

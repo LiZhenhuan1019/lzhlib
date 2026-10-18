@@ -1,10 +1,9 @@
-#include <iostream>
-#include <cassert>
+#include "test_check.hpp"
 
 #include "test_repository.hpp"
 
+
 int main()
 {
-    lzhlib::test::repository::test();
-    return 0;
+    return lzhlib::test::run("test_repository", lzhlib::test::repository::test);
 }

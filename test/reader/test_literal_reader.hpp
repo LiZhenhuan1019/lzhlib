@@ -1,7 +1,7 @@
 #ifndef LZHLIB_TEST_LITERAL_READER_HPP
 #define LZHLIB_TEST_LITERAL_READER_HPP
 #include <functional>
-#include <cassert>
+#include "test_check.hpp"
 #include <lzhlib/reader/literal_reader.hpp>
 namespace lzhlib::test::reader::literal_reader
 {
@@ -21,9 +21,9 @@ namespace lzhlib::test::reader::literal_reader
                                                                 type<std::string>,
                                                                 type<int, std::function<int(std::string_view)>>>>;
         reader c1(arg<2>(f));
-        assert(c1.read<0>("2") == 2);
-        assert(c1.read<1>("\"hello\"") == "hello");
-        assert(c1.read<2>("") == 1);
+        LZH_TEST_CHECK(c1.read<0>("2") == 2);
+        LZH_TEST_CHECK(c1.read<1>("\"hello\"") == "hello");
+        LZH_TEST_CHECK(c1.read<2>("") == 1);
     }
 }
 #endif //LZHLIB_TEST_LITERAL_READER_HPP

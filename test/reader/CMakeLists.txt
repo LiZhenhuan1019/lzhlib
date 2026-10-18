@@ -7,3 +7,4 @@ add_executable(test_reader
         test_dynamic_reader.hpp
         )
 target_link_libraries(test_reader lzhlib)
+add_test(NAME test_reader COMMAND test_reader)

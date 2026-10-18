@@ -2,7 +2,7 @@
 #define LZHLIB_GRAPH_TEST_GRAPH_HPP
 
 #include <lzhlib/graphics/matrix.hpp>
-#include <cassert>
+#include "test_check.hpp"
 namespace lzhlib::test
 {
     namespace graphics
@@ -42,7 +42,7 @@ namespace lzhlib::test
                                            5};
                 basic_matrix<int, 1, 2> m1{3, 4};
                 auto result = multiply_matrices(m0, m1);
-                assert((result == basic_matrix<int, 3, 2>{6, 8,
+                LZH_TEST_CHECK((result == basic_matrix<int, 3, 2>{6, 8,
                                                          9, 12,
                                                          15, 20}));
             }
@@ -58,7 +58,7 @@ namespace lzhlib::test
                      0,
                     };
                 auto result = multiply_matrices(m0, m1);
-                assert((result == basic_matrix<float, 3, 1>{0, 0, 1}));
+                LZH_TEST_CHECK((result == basic_matrix<float, 3, 1>{0, 0, 1}));
             }
             {
                 basic_matrix<std::size_t, 30, 35> m0
@@ -311,7 +311,7 @@ namespace lzhlib::test
                      8976262569726196, 7744762430294257, 7412961474468700, 8782856943456204, 8399051962028800, 6440187995500501, 8103475669959004, 8119381468367289,
                      7178785866296139,
                     };
-                assert(result == expected);
+                LZH_TEST_CHECK(result == expected);
             }
         }
         void test_multiply_operator()
@@ -324,8 +324,8 @@ namespace lzhlib::test
             basic_matrix<int, 2, 3> result2 = m0 * m1;
             basic_matrix<int, 2, 3> expected{6, 4, 8,
                                              3, 2, 4};
-            assert(result1 == expected);
-            assert(result2 == expected);
+            LZH_TEST_CHECK(result1 == expected);
+            LZH_TEST_CHECK(result2 == expected);
         }
         void test()
         {

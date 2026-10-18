@@ -6,3 +6,4 @@ add_executable(test_list
         test_list.cpp
         test_list.hpp)
 target_link_libraries(test_list lzhlib)
+add_test(NAME test_list COMMAND test_list)

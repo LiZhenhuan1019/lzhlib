@@ -1,5 +1,9 @@
+#include "test_check.hpp"
+
 #include "test_reader.hpp"
+
+
 int main()
 {
-    lzhlib::test::reader::test();
+    return lzhlib::test::run("test_reader", lzhlib::test::reader::test);
 }

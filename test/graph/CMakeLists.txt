@@ -8,3 +8,4 @@ add_executable(test_graph
         white_box_test.cpp
         white_box_test.hpp )
 target_link_libraries(test_graph lzhlib)
+add_test(NAME test_graph COMMAND test_graph)

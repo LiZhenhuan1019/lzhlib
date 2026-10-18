@@ -1,6 +1,9 @@
+#include "test_check.hpp"
+
 #include "test_thread.hpp"
+
 
 int main()
 {
-    lzhlib::test::thread::test();
+    return lzhlib::test::run("test_thread", lzhlib::test::thread::test);
 }

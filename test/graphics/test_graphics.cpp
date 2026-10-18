@@ -1,11 +1,9 @@
-#include <iostream>
-#include <cassert>
+#include "test_check.hpp"
 
 #include "test_graphics.hpp"
 
 
 int main()
 {
-    lzhlib::test::graphics::test();
-    return 0;
+    return lzhlib::test::run("test_graphics", lzhlib::test::graphics::test);
 }

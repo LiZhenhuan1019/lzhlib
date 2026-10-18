@@ -7,3 +7,4 @@ add_executable(test_utility
         test_utility.hpp
         test_optional.hpp)
 target_link_libraries(test_utility lzhlib)
+add_test(NAME test_utility COMMAND test_utility)

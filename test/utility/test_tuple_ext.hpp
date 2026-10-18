@@ -2,7 +2,7 @@
 #define LZHLIB_TEST_TUPLE_EXT_HPP
 #include <vector>
 #include <string>
-#include <cassert>
+#include "test_check.hpp"
 #include "lzhlib/utility/tuple_ext.hpp"
 namespace lzhlib::test
 {
@@ -31,7 +31,7 @@ namespace lzhlib::test
                 using namespace std::literals;
                 auto t2 = lzhlib::tuple::create_tuple<decltype(t1)>(arg<1>("hello"), arg<3>({"string 1"s, "string 2"s}), arg<4>(1));
                 static_assert(std::is_same_v<decltype(t1), decltype(t2)>, "test failed : type does not match.");
-                assert(t1 == t2);
+                LZH_TEST_CHECK(t1 == t2);
             }
         }
     }

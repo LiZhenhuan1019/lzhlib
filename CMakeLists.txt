@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(lzhlib
-        VERSION 0.3)
+        VERSION 0.4)
 
 if (NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17)
@@ -30,10 +30,13 @@ install(TARGETS lzhlib EXPORT lzhlib_target)
 install(EXPORT lzhlib_target DESTINATION ${lib_install_path})
 add_subdirectory("include/${PROJECT_NAME}")
 add_subdirectory(src)
+
+# ctest has to be enabled in the top level directory, otherwise the add_test()
+# calls in test/ are silently ignored.
+enable_testing()
 add_subdirectory(test)
 
 if (LZHLIB_BUILD_GTEST)
-    enable_testing()
     add_subdirectory(test/unit)
 endif ()
 

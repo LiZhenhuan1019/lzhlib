@@ -7,3 +7,4 @@ add_executable(test_repository
         test_repository.cpp
         )
 target_link_libraries(test_repository lzhlib)
+add_test(NAME test_repository COMMAND test_repository)

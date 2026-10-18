@@ -1,6 +1,6 @@
 #ifndef LZHLIB_TEST_DYNAMIC_READER_HPP
 #define LZHLIB_TEST_DYNAMIC_READER_HPP
-#include <cassert>
+#include "test_check.hpp"
 #include <lzhlib/reader/dynamic_reader.hpp>
 namespace lzhlib::test::reader::dynamic_reader
 {
@@ -38,8 +38,8 @@ namespace lzhlib::test::reader::dynamic_reader
         using reader = lzhlib::reader::dynamic_reader<type_list<type<int>, type<detail::not_default_destructible, detail::read_from_string_view>>>;
         reader r0;
         r0.read(1, "42");
-        assert(!r0.get<0>().has_value());
-        assert(r0.get<1>() == detail::not_default_destructible(42));
+        LZH_TEST_CHECK(!r0.get<0>().has_value());
+        LZH_TEST_CHECK(r0.get<1>() == detail::not_default_destructible(42));
     };
 }
 #endif //LZHLIB_TEST_DYNAMIC_READER_HPP

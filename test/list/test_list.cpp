@@ -1,5 +1,9 @@
+#include "test_check.hpp"
+
 #include "test_list.hpp"
+
+
 int main()
 {
-    lzhlib::test::list::test();
+    return lzhlib::test::run("test_list", lzhlib::test::list::test);
 }

@@ -1,6 +1,6 @@
 #ifndef LZHLIB_REPOSITORY_TEST_REPOSITORY_HPP
 #define LZHLIB_REPOSITORY_TEST_REPOSITORY_HPP
-#include <cassert>
+#include "test_check.hpp"
 #include <map>
 #include "lzhlib/repository/repository.hpp"
 
@@ -36,13 +36,13 @@ namespace lzhlib::test
                 auto s0 = repo.assign_object("a");
                 auto s1 = repo.assign_object("b");
 
-                assert(repo.get_object(s0) == "a");
-                assert(repo.get_object(s1) == "b");
+                LZH_TEST_CHECK(repo.get_object(s0) == "a");
+                LZH_TEST_CHECK(repo.get_object(s1) == "b");
 
                 repo.get_object(s0) = "c";
                 repo.get_object(s1) = "d";
-                assert(repo.get_object(s0) == "c");
-                assert(repo.get_object(s1) == "d");
+                LZH_TEST_CHECK(repo.get_object(s0) == "c");
+                LZH_TEST_CHECK(repo.get_object(s1) == "d");
             }
             void test_iter_by_id()
             {
@@ -57,18 +57,18 @@ namespace lzhlib::test
                 for (; id != repo.end_id(); id = repo.next_id(id))
                 {
                     verifier[repo.get_object(id)]++;
-                    assert(verifier[repo.get_object(id)] == 1);
+                    LZH_TEST_CHECK(verifier[repo.get_object(id)] == 1);
                 }
                 for (id = repo.prev_id(repo.end_id()); id != repo.first_id(); id = repo.prev_id(id))
                 {
                     verifier[repo.get_object(id)]++;
-                    assert(verifier[repo.get_object(id)] == 2);
+                    LZH_TEST_CHECK(verifier[repo.get_object(id)] == 2);
                 }
                 verifier[repo.get_object(id)]++;
-                assert(verifier[repo.get_object(id)] == 2);
+                LZH_TEST_CHECK(verifier[repo.get_object(id)] == 2);
                 for (auto const &each : verifier)
                 {
-                    assert(each.second == 2);
+                    LZH_TEST_CHECK(each.second == 2);
                 }
             }
             void test_iterator()
@@ -82,28 +82,28 @@ namespace lzhlib::test
                 for (auto iter = repo.begin(); iter != repo.end(); ++iter)
                 {
                     verifier[*iter]++;
-                    assert(verifier[*iter] == 1);
+                    LZH_TEST_CHECK(verifier[*iter] == 1);
                 }
                 {
                     auto iter = repo.end();
                     for (--iter; iter != repo.begin(); --iter)
                     {
                         verifier[*iter]++;
-                        assert(verifier[*iter] == 2);
+                        LZH_TEST_CHECK(verifier[*iter] == 2);
                     }
 
                     verifier[*iter]++;
-                    assert(verifier[*iter] == 2);
+                    LZH_TEST_CHECK(verifier[*iter] == 2);
                 }
                 for (auto &str:repo)
                 {
                     verifier[str]++;
-                    assert(verifier[str] == 3);
+                    LZH_TEST_CHECK(verifier[str] == 3);
                 }
 
                 for (auto const &each : verifier)
                 {
-                    assert(each.second == 3);
+                    LZH_TEST_CHECK(each.second == 3);
                 }
             }
         }

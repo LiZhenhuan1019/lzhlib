@@ -73,6 +73,9 @@ namespace lzhlib
             unused_head = list.form_list(0, init_size);
         }
 
+        // Comparison operators are members of iterator / const_iterator instead of
+        // friend templates: default template arguments are not allowed on friend
+        // templates, and clang re-defines such a friend once per instantiation.
         struct base_iter
         {
             using difference_type = std::ptrdiff_t;
@@ -80,20 +83,6 @@ namespace lzhlib
             using pointer = value_type *;
             using reference = value_type &;
             using iterator_category = std::bidirectional_iterator_tag;
-        private:
-            template <typename iter1, typename iter2>
-            static constexpr bool is_iterator_v = std::is_base_of_v<base_iter, iter1> && std::is_base_of_v<base_iter, iter2>;
-        public:
-            template <typename iter1, typename iter2, std::enable_if_t<is_iterator_v<iter1, iter2>, int> = 0>
-            friend bool operator==(iter1 const &lhs, iter2 const &rhs)
-            {
-                return lhs.id() == rhs.id();
-            }
-            template <typename iter1, typename iter2, std::enable_if_t<is_iterator_v<iter1, iter2>, int> = 0>
-            friend bool operator!=(iter1 const &lhs, iter2 const &rhs)
-            {
-                return !(lhs == rhs);
-            }
         };
 
         class iterator;
@@ -142,6 +131,15 @@ namespace lzhlib
             id_t id() const
             {
                 return id_;
+            }
+
+            bool operator==(const_iterator const &other) const
+            {
+                return id_ == other.id_;
+            }
+            bool operator!=(const_iterator const &other) const
+            {
+                return id_ != other.id_;
             }
 
 
@@ -196,6 +194,25 @@ namespace lzhlib
             id_t id() const
             {
                 return id_;
+            }
+
+            bool operator==(iterator const &other) const
+            {
+                return id_ == other.id_;
+            }
+            bool operator!=(iterator const &other) const
+            {
+                return id_ != other.id_;
+            }
+            // mixed comparison: the implicit object argument is never converted by
+            // user defined conversions, so iterator has to accept const_iterator too.
+            bool operator==(const_iterator const &other) const
+            {
+                return id_ == other.id();
+            }
+            bool operator!=(const_iterator const &other) const
+            {
+                return id_ != other.id();
             }
         private:
             std::reference_wrapper<value_repo> repo;

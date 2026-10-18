@@ -2,7 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 project(lzhlib
         VERSION 0.3)
 
-set(CMAKE_CXX_STANDARD 17)
+if (NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+endif ()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+option(LZHLIB_BUILD_GTEST "Build GoogleTest based unit tests" OFF)
+option(LZHLIB_BUILD_BENCHMARKS "Build Google Benchmark based micro benchmarks" OFF)
 
 set(bin_install_path "bin")
 set(main_include_install_path "include/${PROJECT_NAME}-${PROJECT_VERSION}")
@@ -25,3 +31,12 @@ install(EXPORT lzhlib_target DESTINATION ${lib_install_path})
 add_subdirectory("include/${PROJECT_NAME}")
 add_subdirectory(src)
 add_subdirectory(test)
+
+if (LZHLIB_BUILD_GTEST)
+    enable_testing()
+    add_subdirectory(test/unit)
+endif ()
+
+if (LZHLIB_BUILD_BENCHMARKS)
+    add_subdirectory(benchmark)
+endif ()

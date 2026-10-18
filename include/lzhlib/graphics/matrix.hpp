@@ -2,6 +2,7 @@
 #define LZHLIB_MATRIX_HPP
 
 #include <cstdlib>
+#include <limits>
 #include <type_traits>
 #include <array>
 #include <tuple>
@@ -36,6 +37,7 @@ namespace lzhlib
         basic_matrix &operator=(Expr const &rhs)
         {
             *this = rhs.evaluate();
+            return *this;
         }
     };
 

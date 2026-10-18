@@ -2,6 +2,7 @@
 #define LZHLIB_REPOSITORY_STOCK_ID_HPP
 
 #include <cstddef>    //for std::size_t
+#include <limits>     //for std::numeric_limits
 
 namespace lzhlib
 {

@@ -1,0 +1,14 @@
+# Line endings.
+#
+# Text files are stored with LF in the repository whatever the platform of the
+# author, and git converts them to the native ending on checkout
+# (core.autocrlf). Before this file existed the index held a mix of CRLF and LF
+# blobs, so editing a file on Windows produced a diff that rewrote every line of
+# it and made the real change impossible to review.
+* text=auto
+
+# Scripts that only ever run on Windows keep CRLF, so that cmd.exe and
+# Windows PowerShell 5.1 are happy even in a checkout with autocrlf=false.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

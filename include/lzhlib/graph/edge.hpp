@@ -2,11 +2,11 @@
 #define LZHLIB_GRAPH_EDGE_HPP
 
 #include <utility>    //for std::pair
+#include "null_value_tag.hpp"
 #include "vertex_id.hpp"
 
 namespace lzhlib
 {
-    class null_value_tag;
     namespace detail
     {
         template <class EdgeValueT = null_value_tag>

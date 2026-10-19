@@ -4,6 +4,7 @@ set(graph_headers
         ${header_path}/lzhlib/graph/edge_id.hpp
         ${header_path}/lzhlib/graph/graph.hpp
         ${header_path}/lzhlib/graph/graph_base.hpp
+        ${header_path}/lzhlib/graph/null_value_tag.hpp
         ${header_path}/lzhlib/graph/undirected_graph.hpp
         ${header_path}/lzhlib/graph/vertex.hpp
         ${header_path}/lzhlib/graph/vertex_id.hpp

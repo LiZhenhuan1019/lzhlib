@@ -5,6 +5,7 @@
 #include <set>           //for std::set
 #include <stdexcept>     //for std::logic_error
 #include "edge_id.hpp"
+#include "null_value_tag.hpp"
 #include "vertex_id.hpp"
 
 namespace lzhlib
@@ -22,10 +23,6 @@ namespace lzhlib
         };
     }
 
-    class null_value_tag
-    {
-        explicit null_value_tag() = default;
-    };
     class edge_ref
     {
     public:
